@@ -2,75 +2,58 @@
 #include <list>
 #include <iterator> // For std::forward_iterator_tag
 #include <cstddef>  // For std::ptrdiff_t
+#include <algorithm>
 
 #ifndef AST_ABSTRACTSYNTAXTREE_H
 #define AST_ABSTRACTSYNTAXTREE_H
 
-template<class AData>
-class IAbstractSyntaxTree{
-public:
-    virtual IAbstractSyntaxTree<AData>* getParent() const = 0;
-
-    virtual void setParent(IAbstractSyntaxTree<AData>* parent) = 0;
-
-    virtual void appendChild(IAbstractSyntaxTree<AData>* child) = 0;
-
-    virtual const AData& getData() const = 0;
-
-    virtual AData& getData() = 0;
-
-    virtual typename std::list<IAbstractSyntaxTree<AData>*>::const_iterator nextChild() = 0;
-
-    virtual typename std::list<IAbstractSyntaxTree<AData>*>::const_iterator endChild() = 0;
-};
-
 namespace AST {
 
 template<class AData>
-class AbstractSyntaxTree : public IAbstractSyntaxTree<AData>, public std::enable_shared_from_this<AbstractSyntaxTree<AData>> {
+class AbstractSyntaxTree {
     private:
-        IAbstractSyntaxTree<AData>* parent;
-        std::list<IAbstractSyntaxTree<AData>*> children;
+        AbstractSyntaxTree<AData>* parent;
+        std::list<AbstractSyntaxTree<AData>*> children;
         AData data;
-        typename std::list<IAbstractSyntaxTree<AData>*>::const_iterator next;
+        typename std::list<AbstractSyntaxTree<AData>*>::const_iterator next;
 
-        AbstractSyntaxTree(IAbstractSyntaxTree<AData>* parent, AData data): parent(parent), data(data) {
+        AbstractSyntaxTree(AbstractSyntaxTree<AData>* parent, AData data): parent(parent), data(data) {
             next = children.begin();
         }
         
-        void setParent(IAbstractSyntaxTree<AData>* parent) {
+        void setParent(AbstractSyntaxTree<AData>* parent) {
             AbstractSyntaxTree::parent = parent;
         }
 
     public:
         explicit AbstractSyntaxTree(AData data): AbstractSyntaxTree(nullptr, data) {};
 
-        IAbstractSyntaxTree<AData>* getParent() const override{
+        AbstractSyntaxTree<AData>* getParent() const{
             return parent;
         }
 
-        void appendChild(IAbstractSyntaxTree<AData>* child) override{
+        void appendChild(AbstractSyntaxTree<AData>* child){
             child->setParent(this);
             children.template emplace_back(child);
             next = children.begin();
         }
 
-        const AData &getData() const override{
+        const AData &getData() const {
             return data;
         };
 
-        AData &getData() override {
+        AData &getData() {
             return data;
         };
 
-        typename std::list<IAbstractSyntaxTree<AData>*>::const_iterator nextChild() override {
+        typename std::list<AbstractSyntaxTree<AData>*>::const_iterator nextChild()  {
             auto tmp = next++;
             if (tmp == children.end())
                 next = children.begin();
             return tmp;
         };
 
-        typename std::list<IAbstractSyntaxTree<AData>*>::const_iterator endChild() override {
+        typename std::list<AbstractSyntaxTree<AData>*>::const_iterator endChild()  {
             return children.end();
         };
 
@@ -79,9 +62,9 @@ class AbstractSyntaxTree : public IAbstractSyntaxTree<AData>, public std::enable
         {
             using iterator_category = std::input_iterator_tag;
             using difference_type   = std::ptrdiff_t;
-            using value_type        = IAbstractSyntaxTree<AData>;
-            using pointer           = IAbstractSyntaxTree<AData>*;  // or also value_type*
-            using reference         = IAbstractSyntaxTree<AData>&;  // or also value_type&
+            using value_type        = AbstractSyntaxTree<AData>;
+            using pointer           = AbstractSyntaxTree<AData>*;  // or also value_type*
+            using reference         = AbstractSyntaxTree<AData>&;  // or also value_type&
 
             explicit Iterator(pointer ptr) : m_ptr(ptr) {}
 
@@ -115,7 +98,7 @@ class AbstractSyntaxTree : public IAbstractSyntaxTree<AData>, public std::enable
         };
 
         typename AbstractSyntaxTree<AData>::Iterator begin() {
-            IAbstractSyntaxTree<AData>* node = this;
+            AbstractSyntaxTree<AData>* node = this;
             while (node->getParent()){
                 node = node->getParent();
             }
@@ -127,6 +110,7 @@ class AbstractSyntaxTree : public IAbstractSyntaxTree<AData>, public std::enable
         };
 
     };
+
 }
 
 
