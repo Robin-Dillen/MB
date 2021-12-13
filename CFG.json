@@ -1,9 +1,9 @@
 {
-  "Variables": ["ROOT","ASSIGN", "LOOP", "BODY", "FUNCION", "NON_DIGIT", "CONDITION", "DIGIT", "OPERATION"],
-  "Terminals": ["while", "incr", "decr", "clear" ,"{","}", ";","a", "b", "c", "d", "e", "f", "g", "h", "i",
+  "Variables": ["ROOT","ASSIGN", "LOOP", "BODY", "FUNCIONNAME", "NON_DIGIT", "CONDITION", "DIGIT", "OPERATION", "ARGUMENT"],
+  "Terminals": ["while", "incr", "decr","{","}", ";","a", "b", "c", "d", "e", "f", "g", "h", "i",
     "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D",
     "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y",
-    "Z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ">" ,"<", "=", "!=", "==",">=", "<="
+    "Z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ">" ,"<", "=", "!=", "==",">=", "<=", ",", ":"
   ],
   "Productions": [
     {"head": "ROOT", "body": ["BODY"]},
@@ -14,14 +14,17 @@
     {"head": "BODY", "body": ["LOOP"]},
     {"head": "ASSIGN", "body": ["incr", "IDENTIFIER", ";"]},
     {"head": "ASSIGN", "body": ["decr", "IDENTIFIER", ";"]},
-    {"head": "ASSIGN", "body": ["clear", "IDENTIFIER", ";"]},
+    {"head": "ASSIGN", "body": ["inplace", "FUNCIONNAME", ":","ARGUMENT", ";"]},
     {"head": "ASSIGN", "body": ["IDENTIFIER", "=", "DIGIT", ";"]},
     {"head": "ASSIGN", "body": ["print", "(", "IDENTIFIERT", ")", ";"]},
+    {"head": "ARGUMENT", "body": ["ARGUMENT", ",", "ARGUMENT"]},
+    {"head": "ARGUMENT", "body": ["IDENTIFIER"]},
     {"head": "CONDITION", "body": ["IDENTIFIER", "OPERATION", "IDENTIFIER"]},
     {"head": "CONDITION", "body": ["IDENTIFIER", "OPERATION", "DIGIT"]},
     {"head": "CONDITION", "body": ["DIGIT", "OPERATION", "IDENTIFIER"]},
     {"head": "CONDITION", "body": ["DIGIT", "OPERATION", "DIGIT"]},
     {"head": "IDENTIFIER", "body": ["NON_DIGIT"]},
+    {"head": "FUNCIONNAME", "body": ["NON_DIGIT"]},
     {"head": "NON_DIGIT", "body": ["NON_DIGIT"]},
     {"head": "NON_DIGIT", "body": ["NON_DIGIT", "NON_DIGIT"]},
     {"head": "NON_DIGIT", "body": ["a"]},

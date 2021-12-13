@@ -11,42 +11,58 @@ Lexer::Lexer(const std::string &characterString) {
 void Lexer::tokenize(const std::string &str){
 
     std::string IdentifierStr;
+    std::string FuncnameStr;
     std::string NumStr;
     std::string punctStr;
+
+    bool readfunction = false;
 
     for(const char Char : str) {
 
         if (isalpha(Char)) { // identifier: [a-zA-Z][a-zA-Z]*
-            /// check if we just stoped reading a number
+            /// check if we just stopped reading a number
             if(!NumStr.empty()){
                 Tokens.push_back(Token(number_, NumStr));
                 NumStr = "";
             }
 
-            IdentifierStr += Char;
+            if(readfunction){
+                FuncnameStr += Char;
+            }
+            else{
+                IdentifierStr += Char;
+            }
 
             if (IdentifierStr == "incr"){
                 Tokens.push_back(Token(incr_, IdentifierStr));
                 IdentifierStr = "";
             }
-            if (IdentifierStr == "decr"){
+            else if (IdentifierStr == "decr"){
                 Tokens.push_back(Token(decr_, IdentifierStr));
                 IdentifierStr = "";
             }
-            if (IdentifierStr == "clear"){
-                Tokens.push_back(Token(clear_, IdentifierStr));
-                IdentifierStr = "";
-            }
-            if (IdentifierStr == "while"){
+            else if (IdentifierStr == "while"){
                 Tokens.push_back(Token(while_, IdentifierStr));
                 IdentifierStr = "";
+            }
+            else if (IdentifierStr == "inplace"){
+                Tokens.push_back(Token(inplace_, IdentifierStr));
+                IdentifierStr = "";
+                readfunction = true;
             }
         }
 
         else if (isdigit(Char) || Char == '.') {   // Number: [0-9.]+
+            /// check if we just stopped reading an IdentifierStr
             if(!IdentifierStr.empty()){
                 Tokens.push_back(Token(identifier_, IdentifierStr));
                 IdentifierStr = "";
+            }
+            /// check if we just stopped reading a FuncnameStr
+            if(!FuncnameStr.empty()){
+                Tokens.push_back(Token(funcname_, FuncnameStr));
+                FuncnameStr = "";
+                readfunction = false;
             }
 
             NumStr += Char;
@@ -54,15 +70,21 @@ void Lexer::tokenize(const std::string &str){
         }
 
         else if (ispunct(Char)) {   // punctuation character : [!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~.]
-            /// check if we just stoped reading an IdentifierStr
+            /// check if we just stopped reading an IdentifierStr
             if(!IdentifierStr.empty()){
                 Tokens.push_back(Token(identifier_, IdentifierStr));
                 IdentifierStr = "";
             }
-                /// check if we just stoped reading a number
+                /// check if we just stopped reading a number
             else if(!NumStr.empty()){
                 Tokens.push_back(Token(number_, NumStr));
                 NumStr = "";
+            }
+            /// check if we just stopped reading a FuncnameStr
+            else if(!FuncnameStr.empty()){
+                Tokens.push_back(Token(funcname_, FuncnameStr));
+                FuncnameStr = "";
+                readfunction = false;
             }
 
             if(!IdentifierStr.empty()){
@@ -119,6 +141,14 @@ void Lexer::tokenize(const std::string &str){
                 Tokens.push_back(Token(semicolon_, punctStr));
                 punctStr = "";
             }
+            else if (punctStr == ","){
+                Tokens.push_back(Token(comma_, punctStr));
+                punctStr = "";
+            }
+            else if (punctStr == ":"){
+                Tokens.push_back(Token(colon_, punctStr));
+                punctStr = "";
+            }
         }
     }
 }
@@ -137,9 +167,6 @@ void Lexer::printTokens(){
                 break;
             case print_:
                 std::cout << "[Print] \t = ";
-                break;
-            case clear_:
-                std::cout << "[Clear] \t = ";
                 break;
             case identifier_:
                 std::cout << "[Identifier] \t = ";
@@ -164,6 +191,18 @@ void Lexer::printTokens(){
                 break;
             case semicolon_:
                 std::cout << "[Semicolon] \t = ";
+                break;
+            case funcname_:
+                std::cout << "[Funcname] \t = ";
+                break;
+            case inplace_:
+                std::cout << "[Inplace] \t = ";
+                break;
+            case comma_:
+                std::cout << "[Comma] \t = ";
+                break;
+            case colon_:
+                std::cout << "[Colon] \t = ";
                 break;
             default:
                 std::cout << "[UnknownType] \t = ";

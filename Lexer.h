@@ -5,10 +5,8 @@
 #include <vector>
 
 enum TokenType {
-    while_, incr_, decr_, print_, clear_, identifier_, number_, operator_, lparen_, rparen_, lbrace_, rbrace_, semicolon_
+    while_, incr_, decr_, print_, identifier_, number_, operator_, lparen_, rparen_, lbrace_, rbrace_, semicolon_, colon_, comma_, inplace_, funcname_
 };
-
-
 
 class Lexer {
 public:
