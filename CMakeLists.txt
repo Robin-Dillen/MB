@@ -1,9 +1,11 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.12)
 project(MB)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(MB main.cpp Compiler.cpp Compiler.h)
+
+add_executable(MB main.cpp)
+
 find_package( PythonLibs 3.9 REQUIRED )
 find_package( PythonInterp 3.9 REQUIRED )
 if (PythonLibs_FOUND)
@@ -14,5 +16,6 @@ if (PythonInterp_FOUND)
 endif ()
 include_directories ( ${PYTHON_INCLUDE_DIRS} )
 
-add_library(AST AbstractSyntaxTree.cpp AbstractSyntaxTree.h)
-target_link_libraries(MB PUBLIC AST ${PYTHON_LIBRARIES})
+add_subdirectory(src)
+
+target_link_libraries(MB PUBLIC Compiler ${PYTHON_LIBRARIES})

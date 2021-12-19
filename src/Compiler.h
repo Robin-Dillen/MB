@@ -2,11 +2,15 @@
 #include <Python.h>
 #include <marshal.h>
 #include <tuple>
-#include "AbstractSyntaxTree.h"
+#include <iostream>
+
+#include "AbstractSyntaxTree/AbstractSyntaxTree.h"
+#include "Data.h"
 
 #ifndef AST_COMPILER_H
 #define AST_COMPILER_H
 
-template <typename T>
-std::tuple<std::string, int> compile(const AST::AbstractSyntaxTree<T>& ast);
+void compile(const AST::AbstractSyntaxTree<Data*>& ast);
+
+
 #endif //AST_COMPILER_H
