@@ -8,7 +8,7 @@ Lexer::Lexer(const std::string &characterString) {
     this->tokenize(characterString);
 }
 
-void Lexer::tokenize(const std::string &str){
+void Lexer::tokenize(const std::string &str) {
 
     std::string IdentifierStr;
     std::string FuncnameStr;
@@ -17,49 +17,43 @@ void Lexer::tokenize(const std::string &str){
 
     bool readfunction = false;
 
-    for(const char Char : str) {
+    for (const char Char: str) {
 
         if (isalpha(Char)) { // identifier: [a-zA-Z][a-zA-Z]*
             /// check if we just stopped reading a number
-            if(!NumStr.empty()){
+            if (!NumStr.empty()) {
                 Tokens.push_back(Token(number_, NumStr));
                 NumStr = "";
             }
 
-            if(readfunction){
+            if (readfunction) {
                 FuncnameStr += Char;
-            }
-            else{
+            } else {
                 IdentifierStr += Char;
             }
 
-            if (IdentifierStr == "incr"){
+            if (IdentifierStr == "incr") {
                 Tokens.push_back(Token(incr_, IdentifierStr));
                 IdentifierStr = "";
-            }
-            else if (IdentifierStr == "decr"){
+            } else if (IdentifierStr == "decr") {
                 Tokens.push_back(Token(decr_, IdentifierStr));
                 IdentifierStr = "";
-            }
-            else if (IdentifierStr == "while"){
+            } else if (IdentifierStr == "while") {
                 Tokens.push_back(Token(while_, IdentifierStr));
                 IdentifierStr = "";
-            }
-            else if (IdentifierStr == "inplace"){
+            } else if (IdentifierStr == "inplace") {
                 Tokens.push_back(Token(inplace_, IdentifierStr));
                 IdentifierStr = "";
                 readfunction = true;
             }
-        }
-
-        else if (isdigit(Char) || Char == '.') {   // Number: [0-9.]+
+        } else if (isdigit(Char) || Char == '.') {   // Number: [0-9.]+
             /// check if we just stopped reading an IdentifierStr
-            if(!IdentifierStr.empty()){
+            if (!IdentifierStr.empty()) {
                 Tokens.push_back(Token(identifier_, IdentifierStr));
                 IdentifierStr = "";
             }
             /// check if we just stopped reading a FuncnameStr
-            if(!FuncnameStr.empty()){
+            if (!FuncnameStr.empty()) {
                 Tokens.push_back(Token(funcname_, FuncnameStr));
                 FuncnameStr = "";
                 readfunction = false;
@@ -67,85 +61,70 @@ void Lexer::tokenize(const std::string &str){
 
             NumStr += Char;
 
-        }
-
-        else if (ispunct(Char)) {   // punctuation character : [!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~.]
+        } else if (ispunct(Char)) {   // punctuation character : [!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~.]
             /// check if we just stopped reading an IdentifierStr
-            if(!IdentifierStr.empty()){
+            if (!IdentifierStr.empty()) {
                 Tokens.push_back(Token(identifier_, IdentifierStr));
                 IdentifierStr = "";
             }
                 /// check if we just stopped reading a number
-            else if(!NumStr.empty()){
+            else if (!NumStr.empty()) {
                 Tokens.push_back(Token(number_, NumStr));
                 NumStr = "";
             }
-            /// check if we just stopped reading a FuncnameStr
-            else if(!FuncnameStr.empty()){
+                /// check if we just stopped reading a FuncnameStr
+            else if (!FuncnameStr.empty()) {
                 Tokens.push_back(Token(funcname_, FuncnameStr));
                 FuncnameStr = "";
                 readfunction = false;
             }
 
-            if(!IdentifierStr.empty()){
+            if (!IdentifierStr.empty()) {
                 Tokens.push_back(Token(identifier_, IdentifierStr));
                 IdentifierStr = "";
-            }
-            else if(!NumStr.empty()){
+            } else if (!NumStr.empty()) {
                 Tokens.push_back(Token(number_, NumStr));
                 NumStr = "";
             }
             punctStr += Char;
 
-            if (punctStr == "<"){
+            if (punctStr == "<") {
                 Tokens.push_back(Token(operator_, punctStr));
                 punctStr = "";
-            }
-            else if (punctStr == ">"){
+            } else if (punctStr == ">") {
                 Tokens.push_back(Token(operator_, punctStr));
                 punctStr = "";
-            }
-            else if (punctStr == "="){
+            } else if (punctStr == "=") {
                 Tokens.push_back(Token(operator_, punctStr));
                 punctStr = "";
-            }
-            else if (punctStr == "<="){
+            } else if (punctStr == "<=") {
                 Tokens.push_back(Token(operator_, punctStr));
                 punctStr = "";
-            }
-            else if (punctStr == ">="){
+            } else if (punctStr == ">=") {
                 Tokens.push_back(Token(operator_, punctStr));
                 punctStr = "";
-            }
-            else if (punctStr == "!="){
+            } else if (punctStr == "!=") {
                 Tokens.push_back(Token(operator_, punctStr));
                 punctStr = "";
-            }
-            else if (punctStr == "{"){
+            } else if (punctStr == "{") {
                 Tokens.push_back(Token(lbrace_, punctStr));
                 punctStr = "";
-            }
-            else if (punctStr == "}"){
+            } else if (punctStr == "}") {
                 Tokens.push_back(Token(rbrace_, punctStr));
                 punctStr = "";
-            }
-            else if (punctStr == "("){
+            } else if (punctStr == "(") {
                 Tokens.push_back(Token(lparen_, punctStr));
                 punctStr = "";
-            }
-            else if (punctStr == ")"){
+            } else if (punctStr == ")") {
                 Tokens.push_back(Token(rparen_, punctStr));
                 punctStr = "";
-            }
-            else if (punctStr == ";"){
+            } else if (punctStr == ";") {
                 Tokens.push_back(Token(semicolon_, punctStr));
                 punctStr = "";
-            }
-            else if (punctStr == ","){
+            } else if (punctStr == ",") {
                 Tokens.push_back(Token(comma_, punctStr));
                 punctStr = "";
-            }
-            else if (punctStr == ":"){
+            } else if (punctStr == ":") {
                 Tokens.push_back(Token(colon_, punctStr));
                 punctStr = "";
             }
@@ -153,9 +132,9 @@ void Lexer::tokenize(const std::string &str){
     }
 }
 
-void Lexer::printTokens(){
-    for(Token token : Tokens) {
-        switch (token.type){
+void Lexer::printTokens() {
+    for (Token token: Tokens) {
+        switch (token.type) {
             case while_:
                 std::cout << "[While] \t = ";
                 break;
