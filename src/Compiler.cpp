@@ -355,7 +355,7 @@ void compile(const AST::AbstractSyntaxTree<Data*> &ast) {
     PyBytes_AsStringAndSize(source, &marshalled, &length);
     std::ofstream file("../test.pyc", std::ios::binary | std::ios::trunc);
     {
-        short int magic_int = 3425; // magic int for python 3.9
+        short int magic_int = (PY_MINOR_VERSION == 9 ? 3420 : 3400); // magic int for python 3.8 or 3.9
         char byte1, byte2, byte3 = '\r', byte4 = '\n';
         byte2 = (char) (magic_int >> 8);
         byte1 = (char) (magic_int & 255);
