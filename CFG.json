@@ -15,6 +15,7 @@
     {"head": "ASSIGN", "body": ["incr", "IDENTIFIER", ";"]},
     {"head": "ASSIGN", "body": ["decr", "IDENTIFIER", ";"]},
     {"head": "ASSIGN", "body": ["inplace", "FUNCIONNAME", ":","ARGUMENT", ";"]},
+    {"head": "ASSIGN", "body": ["FUNCIONNAME", ":","ARGUMENT", ";"]},
     {"head": "ASSIGN", "body": ["IDENTIFIER", "=", "DIGIT", ";"]},
     {"head": "ASSIGN", "body": ["print", "(", "IDENTIFIERT", ")", ";"]},
     {"head": "ARGUMENT", "body": ["ARGUMENT", ",", "ARGUMENT"]},
