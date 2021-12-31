@@ -178,7 +178,7 @@ void constructIncr(typename AST::AbstractSyntaxTree<Data*>::Const_Iterator& node
 
     program << (unsigned char) LOAD_NAME << (unsigned char)name_index << EOL;
     program << (unsigned char) LOAD_CONST << (unsigned char)const_index << EOL;
-    program += (unsigned char) INPLACE_ADD;
+    program << (unsigned char) INPLACE_SUBTRACT << (unsigned char)0 << EOL;
     program << (unsigned char) STORE_NAME << (unsigned char)name_index << EOL;
 }
 
