@@ -23,16 +23,6 @@ node_type While::getType() const {
     return while_;
 }
 
-// ------------------------------------- EndWhile -------------------------------------
-
-bool EndWhile::operator==(node_type type) const {
-    return endwhile_ == type;
-}
-
-node_type EndWhile::getType() const {
-    return endwhile_;
-}
-
 // ------------------------------------- Incr -------------------------------------
 
 bool Incr::operator==(node_type type) const {
@@ -119,4 +109,14 @@ node_type Const::getType() const {
 
 unsigned int Const::get() const {
     return value;
+}
+
+// ------------------------------------- End -------------------------------------
+
+bool End::operator==(node_type type) const {
+    return end_ == type;
+}
+
+node_type End::getType() const {
+    return end_;
 }

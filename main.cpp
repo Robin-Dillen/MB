@@ -15,7 +15,7 @@ int main(){
     AST::AbstractSyntaxTree<Data*> ast_var4(variable);
     AST::AbstractSyntaxTree<Data*> ast_const(new Const(5));
     AST::AbstractSyntaxTree<Data*> ast_while(new While);
-    AST::AbstractSyntaxTree<Data*> ast_endwhile(new EndWhile);
+    AST::AbstractSyntaxTree<Data*> ast_endwhile(new End);
     AST::AbstractSyntaxTree<Data*> ast_print(new Print);
     AST::AbstractSyntaxTree<Data*> ast_decr(new Decr);
 

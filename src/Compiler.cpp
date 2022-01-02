@@ -5,8 +5,17 @@
 #include <functional>
 #include <fstream>
 #include <vector>
+#include <exception>
+#include <sstream>
 
 static const unsigned char EOL[4] = "EOL";
+
+class CompilationError: public std::runtime_error{
+public:
+    explicit CompilationError(const std::string &arg) : runtime_error(arg) {}
+
+    ~CompilationError() noexcept override = default;
+};
 
 class Program{
     int line_no{0};
@@ -152,18 +161,23 @@ void constructWhile(typename AST::AbstractSyntaxTree<Data*>::Const_Iterator& nod
     program << (unsigned char) LOAD_CONST << (unsigned char)const_index << EOL;
     program << (unsigned char) COMPARE_OP << (unsigned char) NEQ << EOL;
     ++node; // body
+    if (node->getData()->getType() == end_){
+        std::stringstream error_msg;
+        error_msg << "Error on line: " << "[WIP]" << " ,can't have a while loop with an empty body!" << std::endl;
+        throw CompilationError(error_msg.str());
+    }
     Program temp;
     AST::AbstractSyntaxTree<Data*>::Const_Iterator node_cpy = node;
     do {
         compileNode(node_cpy, temp);
         ++node_cpy;
-    } while (node_cpy->getData()->getType() != endwhile_);
+    } while (node_cpy->getData()->getType() != end_);
     std::cout << temp.getLineNo() << std::endl;
     program << (unsigned char) POP_JUMP_IF_FALSE << (unsigned char)(program.getLineNo() + temp.getLineNo() + 4) << EOL; // +2 for current op and +2 for jump absolute
     do {
         compileNode(node, program);
         ++node;
-    } while (node->getData()->getType() != endwhile_);
+    } while (node->getData()->getType() != end_);
     program << (unsigned char) JUMP_ABSOLUTE << (unsigned char) begin << EOL;
 }
 
@@ -178,7 +192,7 @@ void constructIncr(typename AST::AbstractSyntaxTree<Data*>::Const_Iterator& node
 
     program << (unsigned char) LOAD_NAME << (unsigned char)name_index << EOL;
     program << (unsigned char) LOAD_CONST << (unsigned char)const_index << EOL;
-    program << (unsigned char) INPLACE_SUBTRACT << (unsigned char)0 << EOL;
+    program << (unsigned char) INPLACE_ADD << (unsigned char)0 << EOL;
     program << (unsigned char) STORE_NAME << (unsigned char)name_index << EOL;
 }
 
@@ -205,7 +219,7 @@ void constructDecr(typename AST::AbstractSyntaxTree<Data*>::Const_Iterator& node
     program << (unsigned char) LOAD_NAME << (unsigned char) name_index << EOL;
     const_index = program.findConstOrAdd(PyLong_FromLongLong(4294967296));
     program << (unsigned char) LOAD_CONST << (unsigned char) const_index << EOL;
-//    program << (unsigned char) INPLACE_SUBTRACT << (unsigned char)0 << EOL;
+    program << (unsigned char) INPLACE_SUBTRACT << (unsigned char)0 << EOL;
     program << (unsigned char) STORE_NAME << (unsigned char)name_index << EOL;
 }
 
@@ -240,7 +254,7 @@ void constructPrint(typename AST::AbstractSyntaxTree<Data*>::Const_Iterator& nod
     program << (unsigned char) LOAD_NAME << (unsigned char) print_index << EOL;
     program << (unsigned char) LOAD_NAME << (unsigned char) var_index << EOL;
     program << (unsigned char) CALL_FUNCTION << (unsigned char)1 << EOL;
-//    program << (unsigned char) POP_TOP << EOL;
+    program << (unsigned char) POP_TOP << (unsigned char)0 << EOL;
 }
 
 
@@ -261,18 +275,28 @@ void constructFunc(typename AST::AbstractSyntaxTree<Data*>::Const_Iterator& node
     }
 
     ++node; // second argument (list of parameters)
-
-    std::vector<std::string> names; /*= node->getData()->get<std::vector<std::string>>(); TODO
+    
+    std::vector<std::string> args;
+    do {
+        Identifier* arg = dynamic_cast<Identifier*>(node->getData());
+        if (arg == nullptr){
+            std::stringstream error_msg;
+            error_msg << "Error on line: " << "[WIP]" << " ,invalid function argument!" << std::endl;
+            throw CompilationError(error_msg.str());
+        }
+        args.emplace_back(arg->get());
+        ++node;
+    } while (node->getData()->getType() != end_);
     { // put the arguments in sys.argv
-        for (const std::string &name: names) {
-            int name_i = program.findValue(PyUnicode_FromStringAndSize(name.c_str(), name.size()));
+        for (const std::string &arg: args) {
+            int name_i = program.findValue(PyUnicode_FromStringAndSize(arg.c_str(), arg.size()));
             program << (unsigned char) LOAD_NAME << (unsigned char) name_i << EOL;
         }
         int argv = program.findValueOrAdd(PyUnicode_FromStringAndSize("argv", 4));
-        program << (unsigned char) BUILD_LIST << (unsigned char) names.size() << EOL;
+        program << (unsigned char) BUILD_LIST << (unsigned char) args.size() << EOL;
         program << (unsigned char) LOAD_NAME << (unsigned char) sys << EOL;
         program << (unsigned char) STORE_ATTR << (unsigned char) argv << EOL;
-    }*/
+    }
 
     int module = program.findValue(PyUnicode_FromStringAndSize(module_name.c_str(), module_name.size()));
     if (module == -1) {
@@ -294,8 +318,8 @@ void constructFunc(typename AST::AbstractSyntaxTree<Data*>::Const_Iterator& node
     if (by_ref) {
         program << (unsigned char) LOAD_NAME << (unsigned char) module << EOL;
         program << (unsigned char) LOAD_ATTR << (unsigned char) output << EOL;
-        program << (unsigned char) UNPACK_SEQUENCE << (unsigned char) names.size() << EOL;
-        for (const std::string &name: names) {
+        program << (unsigned char) UNPACK_SEQUENCE << (unsigned char) args.size() << EOL;
+        for (const std::string &name: args) {
             int name_i = program.findValue(PyUnicode_FromStringAndSize(name.c_str(), name.size()));
             program << (unsigned char) STORE_NAME << (unsigned char) name_i << EOL;
         }

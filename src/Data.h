@@ -26,13 +26,6 @@ public:
     node_type getType() const override;
 };
 
-class EndWhile: public Data{
-public:
-    bool operator==(node_type type) const override;
-
-    node_type getType() const override;
-};
-
 class Incr: public Data{
 public:
     bool operator==(node_type type) const override;
@@ -102,6 +95,13 @@ public:
 
 private:
     unsigned int value;
+};
+
+class End: public Data{
+public:
+    bool operator==(node_type type) const override;
+
+    node_type getType() const override;
 };
 
 
