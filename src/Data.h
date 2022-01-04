@@ -10,14 +10,13 @@ public:
     virtual bool operator==(node_type type) const = 0;
 
     virtual node_type getType() const = 0;
+};
 
-    template<typename type>
-    type get() const{
-        return {};
-    }
+class Root: public Data {
+public:
+    bool operator==(node_type type) const override;
 
-private:
-    std::string name;
+    node_type getType() const override;
 };
 
 class While: public Data{
@@ -57,13 +56,13 @@ public:
 
 class Func: public Data{
 public:
+    explicit Func(bool inline_);
+
     bool operator==(node_type type) const override;
 
     node_type getType() const override;
 
-    bool get() const{
-        return inline_;
-    }
+    bool get() const;
 
 private:
     bool inline_;
@@ -71,13 +70,13 @@ private:
 
 class Identifier: public Data{
 public:
+    explicit Identifier(std::string name);
+
     bool operator==(node_type type) const override;
 
     node_type getType() const override;
 
-    std::string get() const{
-        return name;
-    }
+    std::string get() const;
 
 private:
     std::string name;
@@ -86,16 +85,23 @@ private:
 
 class Const: public Data{
 public:
+    explicit Const(unsigned int value);
+
     bool operator==(node_type type) const override;
 
     node_type getType() const override;
 
-    unsigned int get() const{
-        return value;
-    }
+    unsigned int get() const;
 
 private:
     unsigned int value;
+};
+
+class End: public Data{
+public:
+    bool operator==(node_type type) const override;
+
+    node_type getType() const override;
 };
 
 

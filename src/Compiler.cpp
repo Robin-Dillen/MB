@@ -5,8 +5,17 @@
 #include <functional>
 #include <fstream>
 #include <vector>
+#include <exception>
+#include <sstream>
 
 static const unsigned char EOL[4] = "EOL";
+
+class CompilationError: public std::runtime_error{
+public:
+    explicit CompilationError(const std::string &arg) : runtime_error(arg) {}
+
+    ~CompilationError() noexcept override = default;
+};
 
 class Program{
     int line_no{0};
@@ -48,7 +57,8 @@ public:
     }
 
     void operator+=(const unsigned char command){
-        PyBytes_ConcatAndDel(&codeObject->co_code, PyBytes_FromString(reinterpret_cast<const char *>(command)));
+        char t = (char)(command);
+        PyBytes_ConcatAndDel(&codeObject->co_code, PyBytes_FromStringAndSize(&t, 1));
         line_no += 2;
     }
 
@@ -138,46 +148,66 @@ void compileNode(typename AST::AbstractSyntaxTree<Data*>::Const_Iterator& node, 
 
 void constructWhile(typename AST::AbstractSyntaxTree<Data*>::Const_Iterator& node, Program& program) {
     ++node; // first argument (identifier)
-    std::string name = node->getData()->get<std::string>();
+    const Identifier* const identifier = dynamic_cast<Identifier *>(node->getData());
+    assert(identifier);
+    std::string name = identifier->get();
+    PyObject* py_name = PyUnicode_FromStringAndSize(name.c_str(), name.size());
+    int name_index = program.findValueOrAdd(py_name);
+
+    int const_index = program.findConstOrAdd(PyLong_FromLong(0));
     int begin = program.getLineNo();
-    PyObject* value = PyUnicode_FromStringAndSize(name.c_str(), name.size());
-    int index = program.findValueOrAdd(value);
-    program << (unsigned char) LOAD_NAME << (unsigned char)index << EOL;
-    index = program.findConstOrAdd(PyLong_FromLong(0));
-    program << (unsigned char) LOAD_CONST << (unsigned char)index << EOL;
+
+    program << (unsigned char) LOAD_NAME << (unsigned char)name_index << EOL;
+    program << (unsigned char) LOAD_CONST << (unsigned char)const_index << EOL;
     program << (unsigned char) COMPARE_OP << (unsigned char) NEQ << EOL;
     ++node; // body
+    if (node->getData()->getType() == end_){
+        std::stringstream error_msg;
+        error_msg << "Error on line: " << "[WIP]" << " ,can't have a while loop with an empty body!" << std::endl;
+        throw CompilationError(error_msg.str());
+    }
     Program temp;
-    compileNode(node, temp);
+    AST::AbstractSyntaxTree<Data*>::Const_Iterator node_cpy = node;
+    do {
+        compileNode(node_cpy, temp);
+        ++node_cpy;
+    } while (node_cpy->getData()->getType() != end_);
+    std::cout << temp.getLineNo() << std::endl;
     program << (unsigned char) POP_JUMP_IF_FALSE << (unsigned char)(program.getLineNo() + temp.getLineNo() + 4) << EOL; // +2 for current op and +2 for jump absolute
-    program << temp.getCode();
-    program.addLines(temp.getLineNo());
+    do {
+        compileNode(node, program);
+        ++node;
+    } while (node->getData()->getType() != end_);
     program << (unsigned char) JUMP_ABSOLUTE << (unsigned char) begin << EOL;
 }
 
 
 void constructIncr(typename AST::AbstractSyntaxTree<Data*>::Const_Iterator& node, Program& program) {
-    ++node; // first argument (variable)
-    std::string name = node->getData()->get<std::string>();
+    ++node; // first argument (identifier)
+    const Identifier* const identifier = dynamic_cast<Identifier *>(node->getData());
+    assert(identifier);
+    std::string name = identifier->get();
     int name_index = program.findValueOrAdd(PyUnicode_FromStringAndSize(name.c_str(), name.size()));
     int const_index = program.findConstOrAdd(PyLong_FromLong(1));
 
     program << (unsigned char) LOAD_NAME << (unsigned char)name_index << EOL;
     program << (unsigned char) LOAD_CONST << (unsigned char)const_index << EOL;
-    program += (unsigned char) INPLACE_ADD;
+    program << (unsigned char) INPLACE_ADD << (unsigned char)0 << EOL;
     program << (unsigned char) STORE_NAME << (unsigned char)name_index << EOL;
 }
 
 
 void constructDecr(typename AST::AbstractSyntaxTree<Data*>::Const_Iterator& node, Program& program) {
-    ++node; // first argument (variable)
-    std::string name = node->getData()->get<std::string>();
+    ++node; // first argument (identifier)
+    const Identifier* const identifier = dynamic_cast<Identifier *>(node->getData());
+    assert(identifier);
+    std::string name = identifier->get();
     int name_index = program.findValueOrAdd(PyUnicode_FromStringAndSize(name.c_str(), name.size()));
     int const_index = program.findConstOrAdd(PyLong_FromLong(1));
 
     program << (unsigned char) LOAD_NAME << (unsigned char)name_index << EOL;
     program << (unsigned char) LOAD_CONST << (unsigned char)const_index << EOL;
-    program += (unsigned char) INPLACE_SUBTRACT;
+    program << (unsigned char) INPLACE_SUBTRACT << (unsigned char)0 << EOL;
     program << (unsigned char) STORE_NAME << (unsigned char)name_index << EOL;
     // add runtime check for negative numbers, if negative add number by 2**32
     const_index = program.findConstOrAdd(PyLong_FromLong(0));
@@ -185,22 +215,26 @@ void constructDecr(typename AST::AbstractSyntaxTree<Data*>::Const_Iterator& node
     program << (unsigned char) LOAD_CONST << (unsigned char) const_index << EOL;
     program << (unsigned char) COMPARE_OP << (unsigned char) LT << EOL;
     int current_lineno = program.getLineNo();
-    program << (unsigned char) POP_JUMP_IF_FALSE << (unsigned char) current_lineno + 10 << EOL;
+    program << (unsigned char) POP_JUMP_IF_FALSE << (unsigned char) current_lineno + 8 << EOL;
     program << (unsigned char) LOAD_NAME << (unsigned char) name_index << EOL;
     const_index = program.findConstOrAdd(PyLong_FromLongLong(4294967296));
     program << (unsigned char) LOAD_CONST << (unsigned char) const_index << EOL;
-    program += (unsigned char) INPLACE_ADD;
+    program << (unsigned char) INPLACE_SUBTRACT << (unsigned char)0 << EOL;
     program << (unsigned char) STORE_NAME << (unsigned char)name_index << EOL;
 }
 
 
 void constructStore(typename AST::AbstractSyntaxTree<Data*>::Const_Iterator& node, Program& program) {
-    ++node; // first argument (variable)
-    std::string name = node->getData()->get<std::string>();
+    ++node; // first argument (identifier)
+    const Identifier* const identifier = dynamic_cast<Identifier *>(node->getData());
+    assert(identifier);
+    std::string name = identifier->get();
     int var_index = program.findValueOrAdd(PyUnicode_FromStringAndSize(name.c_str(), name.size()));
 
     ++node; // second argument (const value)
-    unsigned int value = node->getData()->get<unsigned int>();
+    const Const* const aConst = dynamic_cast<Const*>(node->getData());
+    assert(aConst);
+    unsigned int value = aConst->get();
     int const_index = program.findConstOrAdd(PyLong_FromLong(value));
 
     program << (unsigned char) LOAD_CONST << (unsigned char)const_index << EOL;
@@ -211,20 +245,27 @@ void constructStore(typename AST::AbstractSyntaxTree<Data*>::Const_Iterator& nod
 void constructPrint(typename AST::AbstractSyntaxTree<Data*>::Const_Iterator& node, Program& program) {
     ++node; // first argument (variable)
     int print_index = program.findValueOrAdd(PyUnicode_FromStringAndSize("print", 5));
-    std::string name = node->getData()->get<std::string>();
+
+    const Identifier* const identifier = dynamic_cast<Identifier *>(node->getData());
+    assert(identifier);
+    std::string name = identifier->get();
     int var_index = program.findValueOrAdd(PyUnicode_FromStringAndSize(name.c_str(), name.size()));
 
     program << (unsigned char) LOAD_NAME << (unsigned char) print_index << EOL;
     program << (unsigned char) LOAD_NAME << (unsigned char) var_index << EOL;
     program << (unsigned char) CALL_FUNCTION << (unsigned char)1 << EOL;
-    program << (unsigned char) POP_TOP << EOL;
+    program << (unsigned char) POP_TOP << (unsigned char)0 << EOL;
 }
 
 
 void constructFunc(typename AST::AbstractSyntaxTree<Data*>::Const_Iterator& node, Program& program) {
-    bool by_ref = node->getData()->get<bool>();
-    ++node; // first argument (module name)
-    std::string module_name = node->getData()->get<std::string>();
+    const Func* const func = dynamic_cast<Func *>(node->getData());
+    assert(func);
+    bool by_ref = func->get();
+    ++node; // first argument (module name/identifier)
+    const Identifier* const identifier = dynamic_cast<Identifier *>(node->getData());
+    assert(identifier);
+    std::string module_name = identifier->get();
 
     int sys= program.findValue(PyUnicode_FromStringAndSize("sys", 3));
     if (sys == -1) {
@@ -234,14 +275,25 @@ void constructFunc(typename AST::AbstractSyntaxTree<Data*>::Const_Iterator& node
     }
 
     ++node; // second argument (list of parameters)
-    std::vector<std::string> names = node->getData()->get<std::vector<std::string>>();
+    
+    std::vector<std::string> args;
+    do {
+        Identifier* arg = dynamic_cast<Identifier*>(node->getData());
+        if (arg == nullptr){
+            std::stringstream error_msg;
+            error_msg << "Error on line: " << "[WIP]" << " ,invalid function argument!" << std::endl;
+            throw CompilationError(error_msg.str());
+        }
+        args.emplace_back(arg->get());
+        ++node;
+    } while (node->getData()->getType() != end_);
     { // put the arguments in sys.argv
-        for (const std::string &name: names) {
-            int name_i = program.findValue(PyUnicode_FromStringAndSize(name.c_str(), name.size()));
+        for (const std::string &arg: args) {
+            int name_i = program.findValue(PyUnicode_FromStringAndSize(arg.c_str(), arg.size()));
             program << (unsigned char) LOAD_NAME << (unsigned char) name_i << EOL;
         }
         int argv = program.findValueOrAdd(PyUnicode_FromStringAndSize("argv", 4));
-        program << (unsigned char) BUILD_LIST << (unsigned char) names.size() << EOL;
+        program << (unsigned char) BUILD_LIST << (unsigned char) args.size() << EOL;
         program << (unsigned char) LOAD_NAME << (unsigned char) sys << EOL;
         program << (unsigned char) STORE_ATTR << (unsigned char) argv << EOL;
     }
@@ -266,8 +318,8 @@ void constructFunc(typename AST::AbstractSyntaxTree<Data*>::Const_Iterator& node
     if (by_ref) {
         program << (unsigned char) LOAD_NAME << (unsigned char) module << EOL;
         program << (unsigned char) LOAD_ATTR << (unsigned char) output << EOL;
-        program << (unsigned char) UNPACK_SEQUENCE << (unsigned char) names.size() << EOL;
-        for (const std::string &name: names) {
+        program << (unsigned char) UNPACK_SEQUENCE << (unsigned char) args.size() << EOL;
+        for (const std::string &name: args) {
             int name_i = program.findValue(PyUnicode_FromStringAndSize(name.c_str(), name.size()));
             program << (unsigned char) STORE_NAME << (unsigned char) name_i << EOL;
         }
@@ -355,7 +407,7 @@ void compile(const AST::AbstractSyntaxTree<Data*> &ast) {
     PyBytes_AsStringAndSize(source, &marshalled, &length);
     std::ofstream file("../test.pyc", std::ios::binary | std::ios::trunc);
     {
-        short int magic_int = (PY_MINOR_VERSION == 9 ? 3420 : 3400); // magic int for python 3.8 or 3.9
+        short int magic_int = (PY_MINOR_VERSION == 9 ? 3425 : 3400); // magic int for python 3.8 or 3.9
         char byte1, byte2, byte3 = '\r', byte4 = '\n';
         byte2 = (char) (magic_int >> 8);
         byte1 = (char) (magic_int & 255);
