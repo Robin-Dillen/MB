@@ -2,7 +2,7 @@
 #define MB_LIB_H
 
 enum node_type {
-    while_, incr_, decr_, identifier_, store_, print_, func_, const_
+    while_, incr_, decr_, identifier_, store_, print_, func_, const_, root_, end_
 };
 
 enum opcodes {
