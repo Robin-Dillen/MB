@@ -1,7 +1,7 @@
 #include "Lexer.h"
 
-/// private struct
-Lexer::Token::Token(TokenType type, const std::string &value) : type(type), value(value) {}
+/// struct
+Token::Token(TokenType type, const std::string &value) : type(type), value(value) {}
 
 /// class Lexer
 Lexer::Lexer(const std::string &characterString) {
@@ -10,8 +10,10 @@ Lexer::Lexer(const std::string &characterString) {
 
 void Lexer::tokenize(const std::string &str) {
 
+    std::vector<std::string> filenames;
+
     std::string IdentifierStr;
-    std::string FuncnameStr;
+    std::string filenameStr;
     std::string NumStr;
     std::string punctStr;
 
@@ -26,9 +28,10 @@ void Lexer::tokenize(const std::string &str) {
                 NumStr = "";
             }
 
-            if (readfunction) {
-                FuncnameStr += Char;
-            } else {
+            if(readfunction){
+                filenameStr += Char;
+            }
+            else{
                 IdentifierStr += Char;
             }
 
@@ -41,10 +44,19 @@ void Lexer::tokenize(const std::string &str) {
             } else if (IdentifierStr == "while") {
                 Tokens.push_back(Token(while_, IdentifierStr));
                 IdentifierStr = "";
+            } else if (IdentifierStr == "const") {
+                Tokens.push_back(Token(const_, IdentifierStr));
+                IdentifierStr = "";
             } else if (IdentifierStr == "inplace") {
                 Tokens.push_back(Token(inplace_, IdentifierStr));
                 IdentifierStr = "";
+            } else if (IdentifierStr == "import") {
+                Tokens.push_back(Token(import_, IdentifierStr));
+                IdentifierStr = "";
                 readfunction = true;
+            } else if (std::find(filenames.begin(), filenames.end(), IdentifierStr) != filenames.end()){
+                Tokens.push_back(Token(filename_, IdentifierStr));
+                IdentifierStr = "";
             }
         } else if (isdigit(Char) || Char == '.') {   // Number: [0-9.]+
             /// check if we just stopped reading an IdentifierStr
@@ -52,10 +64,11 @@ void Lexer::tokenize(const std::string &str) {
                 Tokens.push_back(Token(identifier_, IdentifierStr));
                 IdentifierStr = "";
             }
-            /// check if we just stopped reading a FuncnameStr
-            if (!FuncnameStr.empty()) {
-                Tokens.push_back(Token(funcname_, FuncnameStr));
-                FuncnameStr = "";
+            /// check if we just stopped reading a filenameStr
+            if (!filenameStr.empty()) {
+                Tokens.push_back(Token(filename_, filenameStr));
+                filenames.push_back(filenameStr);
+                filenameStr = "";
                 readfunction = false;
             }
 
@@ -68,24 +81,18 @@ void Lexer::tokenize(const std::string &str) {
                 IdentifierStr = "";
             }
                 /// check if we just stopped reading a number
-            else if (!NumStr.empty()) {
+            if (!NumStr.empty()) {
                 Tokens.push_back(Token(number_, NumStr));
                 NumStr = "";
             }
-                /// check if we just stopped reading a FuncnameStr
-            else if (!FuncnameStr.empty()) {
-                Tokens.push_back(Token(funcname_, FuncnameStr));
-                FuncnameStr = "";
+            /// check if we just stopped reading a filenameStr
+            if (!filenameStr.empty()) {
+                Tokens.push_back(Token(filename_, filenameStr));
+                filenames.push_back(filenameStr);
+                filenameStr = "";
                 readfunction = false;
             }
 
-            if (!IdentifierStr.empty()) {
-                Tokens.push_back(Token(identifier_, IdentifierStr));
-                IdentifierStr = "";
-            } else if (!NumStr.empty()) {
-                Tokens.push_back(Token(number_, NumStr));
-                NumStr = "";
-            }
             punctStr += Char;
 
             if (punctStr == "<") {
@@ -127,6 +134,25 @@ void Lexer::tokenize(const std::string &str) {
             } else if (punctStr == ":") {
                 Tokens.push_back(Token(colon_, punctStr));
                 punctStr = "";
+            }
+        }
+        else{
+            /// check if we just stopped reading an IdentifierStr
+            if (!IdentifierStr.empty()) {
+                Tokens.push_back(Token(identifier_, IdentifierStr));
+                IdentifierStr = "";
+            }
+            /// check if we just stopped reading a number
+            if (!NumStr.empty()) {
+                Tokens.push_back(Token(number_, NumStr));
+                NumStr = "";
+            }
+            /// check if we just stopped reading a filenameStr
+            if (!filenameStr.empty()) {
+                Tokens.push_back(Token(filename_, filenameStr));
+                filenames.push_back(filenameStr);
+                filenameStr = "";
+                readfunction = false;
             }
         }
     }
@@ -171,8 +197,8 @@ void Lexer::printTokens() {
             case semicolon_:
                 std::cout << "[Semicolon] \t = ";
                 break;
-            case funcname_:
-                std::cout << "[Funcname] \t = ";
+            case filename_:
+                std::cout << "[Filename] \t = ";
                 break;
             case inplace_:
                 std::cout << "[Inplace] \t = ";
@@ -183,9 +209,19 @@ void Lexer::printTokens() {
             case colon_:
                 std::cout << "[Colon] \t = ";
                 break;
+            case const_:
+                std::cout << "[Const] \t = ";
+                break;
+            case import_:
+                std::cout << "[Import] \t = ";
+                break;
             default:
                 std::cout << "[UnknownType] \t = ";
         }
         std::cout << token.value << std::endl;
     }
+}
+
+const std::vector<Token> &Lexer::getTokens() const {
+    return Tokens;
 }

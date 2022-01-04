@@ -3,9 +3,17 @@
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 enum TokenType {
-    while_, incr_, decr_, print_, identifier_, number_, operator_, lparen_, rparen_, lbrace_, rbrace_, semicolon_, colon_, comma_, inplace_, funcname_
+    while_, incr_, decr_, print_, import_, identifier_, number_, operator_, lparen_, rparen_, lbrace_, rbrace_, semicolon_, colon_, comma_, inplace_, filename_, const_
+};
+
+struct Token{
+    Token(TokenType type, const std::string &value);
+
+    TokenType type;
+    std::string value;
 };
 
 class Lexer {
@@ -16,14 +24,9 @@ public:
 
     void printTokens();
 
+    const std::vector<Token> &getTokens() const;
+
 private:
-
-    struct Token{
-        Token(TokenType type, const std::string &value);
-
-        TokenType type;
-        std::string value;
-    };
 
     std::vector<Token> Tokens;
 };
