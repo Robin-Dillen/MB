@@ -7,7 +7,6 @@ FileLoader::FileLoader(const std::string &filename) {
 
 void FileLoader::readfile(const std::string &filename){
 
-
     char byte = 0;
 
     std::ifstream input_file(filename);
@@ -19,15 +18,19 @@ void FileLoader::readfile(const std::string &filename){
 
     /// while the file is open read contents
     while (input_file.get(byte)) {
-        if(byte == ' ' || byte == '\n'|| byte == '\t'|| byte == '\r'){
-            continue;
-        }
         filecontents.push_back(byte);
     }
 
     input_file.close();
 }
 
-const std::string &FileLoader::getFilecontents() const {
-    return filecontents;
+std::string FileLoader::getFilecontents(const std::vector<char> &exceptions) const{
+    // Traverse the string
+    std::string filecontents_ = filecontents;
+    for (int i = 0; i < exceptions.size(); i++) {
+        //remove exceptions from string
+        filecontents_.erase(remove(filecontents_.begin(), filecontents_.end(), exceptions[i]), filecontents_.end());
+    }
+
+    return filecontents_;
 }
