@@ -7,15 +7,24 @@
 #include <vector>
 #include <exception>
 #include <sstream>
+#include <sys/stat.h>
+
+namespace fs = std;
 
 static const unsigned char EOL[4] = "EOL";
 
 class CompilationError: public std::runtime_error{
 public:
-    explicit CompilationError(const std::string &arg) : runtime_error(arg) {}
+    explicit CompilationError(const std::string &arg) : runtime_error(arg) {
+    }
 
     ~CompilationError() noexcept override = default;
 };
+
+inline bool file_exists (const std::string& name) {
+    struct stat buffer;
+    return (stat (name.c_str(), &buffer) == 0);
+}
 
 class Program{
     int line_no{0};
@@ -300,6 +309,11 @@ void constructFunc(typename AST::AbstractSyntaxTree<Data*>::Const_Iterator& node
 
     int module = program.findValue(PyUnicode_FromStringAndSize(module_name.c_str(), module_name.size()));
     if (module == -1) {
+        if (!file_exists(module_name)){
+            std::stringstream error_msg;
+            error_msg << "Error on line: " << "[WIP]" << " ,file not found!" << std::endl;
+            throw CompilationError(error_msg.str());
+        }
         program << (unsigned char) IMPORT_NAME << (unsigned char) module << EOL;
         program << (unsigned char) STORE_NAME << (unsigned char) module << EOL;
     } else {
@@ -309,7 +323,7 @@ void constructFunc(typename AST::AbstractSyntaxTree<Data*>::Const_Iterator& node
         program << (unsigned char) LOAD_METHOD << (unsigned char) reload << EOL;
         program << (unsigned char) LOAD_NAME << (unsigned char) module << EOL;
         program << (unsigned char) CALL_METHOD << (unsigned char) 1 << EOL;
-        program += (unsigned char) POP_TOP;
+        program << (unsigned char) POP_TOP << (unsigned char) 0 << EOL;
     }
 
 
@@ -407,14 +421,14 @@ void compile(const AST::AbstractSyntaxTree<Data*> &ast) {
     PyBytes_AsStringAndSize(source, &marshalled, &length);
     std::ofstream file("../test.pyc", std::ios::binary | std::ios::trunc);
     {
-        short int magic_int = (PY_MINOR_VERSION == 9 ? 3425 : 3400); // magic int for python 3.8 or 3.9
+        constexpr short int magic_int = (PY_MINOR_VERSION == 9 ? 3425 : 3400); // magic int for python 3.8 or 3.9
         char byte1, byte2, byte3 = '\r', byte4 = '\n';
         byte2 = (char) (magic_int >> 8);
         byte1 = (char) (magic_int & 255);
         file << byte1 << byte2 << byte3 << byte4 << '\x00' << '\x00' << '\x00' << '\x00';
     }
     {
-        int t = 1638344492; // timestamp
+        int t = time(nullptr); // timestamp
         unsigned char timestamp[4];
         for (int i = 0; i < 4; i++)
             timestamp[i] = (t >> (i * 8));
