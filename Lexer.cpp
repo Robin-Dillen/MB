@@ -1,3 +1,4 @@
+
 #include "Lexer.h"
 
 /// struct
@@ -159,69 +160,66 @@ void Lexer::tokenize(const std::string &str) {
 }
 
 void Lexer::printTokens() {
+
     for (Token token: Tokens) {
-        switch (token.type) {
-            case while_:
-                std::cout << "[While] \t = ";
-                break;
-            case incr_:
-                std::cout << "[Incr] \t\t = ";
-                break;
-            case decr_:
-                std::cout << "[Decr] \t\t = ";
-                break;
-            case print_:
-                std::cout << "[Print] \t = ";
-                break;
-            case identifier_:
-                std::cout << "[Identifier] \t = ";
-                break;
-            case number_:
-                std::cout << "[Number] \t = ";
-                break;
-            case operator_:
-                std::cout << "[Operator] \t = ";
-                break;
-            case lparen_:
-                std::cout << "[Lparen] \t = ";
-                break;
-            case rparen_:
-                std::cout << "[Rparen] \t = ";
-                break;
-            case lbrace_:
-                std::cout << "[Lbrace] \t = ";
-                break;
-            case rbrace_:
-                std::cout << "[Rbrace] \t = ";
-                break;
-            case semicolon_:
-                std::cout << "[Semicolon] \t = ";
-                break;
-            case filename_:
-                std::cout << "[Filename] \t = ";
-                break;
-            case inplace_:
-                std::cout << "[Inplace] \t = ";
-                break;
-            case comma_:
-                std::cout << "[Comma] \t = ";
-                break;
-            case colon_:
-                std::cout << "[Colon] \t = ";
-                break;
-            case const_:
-                std::cout << "[Const] \t = ";
-                break;
-            case import_:
-                std::cout << "[Import] \t = ";
-                break;
-            default:
-                std::cout << "[UnknownType] \t = ";
+        std::cout << "[" << getTokenName(token) << "]";
+        for(int i = 0; i <= 1 - floor(((double)getTokenName(token).size()+2.0)/8.0); i++){
+            std::cout << "\t";
         }
-        std::cout << token.value << std::endl;
+        std::cout << "= " <<  token.value << std::endl;
     }
+}
+
+void Lexer::printTokenString(){
+    for (Token token: Tokens) {
+        std::cout << getTokenName(token) << "";
+    }
+    std::cout << std::endl;
 }
 
 const std::vector<Token> &Lexer::getTokens() const {
     return Tokens;
+}
+
+std::string Lexer::getTokenName(const Token& token) const{
+    switch (token.type) {
+        case while_:
+            return "while";
+        case incr_:
+            return "incr";
+        case decr_:
+            return "decr";
+        case print_:
+            return "print";
+        case identifier_:
+            return "identifier";
+        case number_:
+            return "number";
+        case operator_:
+            return "operator";
+        case lparen_:
+            return "lparen";
+        case rparen_:
+            return "rparen";
+        case lbrace_:
+            return "lbrace";
+        case rbrace_:
+            return "rbrace";
+        case semicolon_:
+            return "semicolon";
+        case filename_:
+            return "filename";
+        case inplace_:
+            return "inplace";
+        case comma_:
+            return "comma";
+        case colon_:
+            return "colon";
+        case const_:
+            return "const";
+        case import_:
+            return "import";
+        default:
+            return "unknownType";
+    }
 }
