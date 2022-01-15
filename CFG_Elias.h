@@ -13,13 +13,13 @@
 #include <set>
 #include <cmath>
 #include <algorithm>
-#include "../json.hpp"
+#include "json.hpp"
 
 using namespace std;
 
 using json = nlohmann::json;
 
-class CFG {
+class CFG_Elias {
 private:
     void readfile(const string &inputfile);
     vector<string> V; // nonterminals (symbols used for the production rules)
@@ -29,15 +29,21 @@ private:
 
 public:
 
-    CFG(const string &inputfile);
-    CFG(const vector<string> &v, const vector<string> &t, const string &startsymbol,
+    CFG_Elias(const string &inputfile);
+
+    void print();
+
+    void add_augmented_productions(string locSymbol);
+
+    map<string, vector<vector<string>>> getClosure(string variable);
+
+    string getStartSymbol();
+
+    CFG_Elias(const vector<string> &v, const vector<string> &t, const string &startsymbol,
         const map<string, vector<vector<string>>> &productionRules);
 
     void toCNF();
 
-    void print();
-
-    void add_augmented_productions();
 
 };
 

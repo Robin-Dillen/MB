@@ -1,10 +1,15 @@
 #include "src/Compiler.h"
 #include "src/Data.h"
 #include <iostream>
+#include "CFG_Elias.h"
+#include "Parser.h"
 
 int main(){
+    Parser p;
+
 
 //    Py_SetPythonHome(L"C:/Users/nibor/AppData/Local/Programs/Python/Python39");
+/*
     Py_Initialize();
     Identifier* variable = new Identifier("x");
     AST::AbstractSyntaxTree<Data*> ast_root(new Root, 0);
@@ -37,6 +42,6 @@ int main(){
     compile(ast_root);
 
     Py_Finalize();
-
+*/
     return 0;
 }

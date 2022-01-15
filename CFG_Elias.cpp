@@ -1,18 +1,17 @@
 
-#include "CFG.h"
+#include "CFG_Elias.h"
+#include <algorithm>
 
-
-CFG::CFG(const string &inputfile) {
-
+CFG_Elias::CFG_Elias(const string &inputfile) {
     readfile(inputfile);
 }
 
-void CFG::readfile(const string &inputfile){
+void CFG_Elias::readfile(const string &inputfile){
     ifstream input(inputfile);
     json j;
     input >> j;
 
-    /// We gaan eerst alle componenten van de CFG bepalen de quadruple: {V,T,P,S}
+    /// We gaan eerst alle componenten van de CFG_Elias bepalen de quadruple: {V,T,P,S}
 
     // Om te sorteren op alfabetische volgorde maak ik tijdelijk een set aan
     set<string> V_temp;
@@ -53,10 +52,8 @@ void CFG::readfile(const string &inputfile){
     startsymbol = j["Start"];
 }
 
-
-
-// gives a visual representations of the CFG
-void CFG::print(){
+// gives a visual representations of the CFG_Elias
+void CFG_Elias::print(){
     cout << "V = {";
     if (!V.empty()){
         for(int i = 0; i < V.size()-1; i++) {
@@ -98,36 +95,47 @@ void CFG::print(){
     cout << "S = " << startsymbol << endl;
 }
 
-CFG::CFG(const vector<string> &v, const vector<string> &t, const string &startsymbol,
+void CFG_Elias::add_augmented_productions(string locSymbol) {
+    /// we add a new startsymbol
+    string new_startsymbool = startsymbol + "'";
+    // making an augmented production by adding •
+    vector<string> rule = {startsymbol};
+    production_rules[new_startsymbool] = {rule};
+    startsymbol = new_startsymbool;
+
+    // making an augmented production by adding • to all the productions
+    for (map<string, vector<vector<string>>>::iterator it = production_rules.begin();
+    it != production_rules.end(); it++) {
+        for (int i = 0; i < production_rules[(*it).first].size(); i++) {
+            // uitzondering voor epsilon productions
+            if (production_rules[(*it).first][i][0] == "") {
+                production_rules[(*it).first][i] = {locSymbol};
+            } else {
+                production_rules[(*it).first][i].insert(production_rules[(*it).first][i].begin(), locSymbol);
+            }
+        }
+    }
+}
+
+map<string, vector<vector<string>>> CFG_Elias::getClosure(string variable) {
+    if (std::find(V.begin(), V.end(), variable) != V.end())
+    {
+        cout<<"oki";
+    }
+}
+
+string CFG_Elias::getStartSymbol() {
+    return startsymbol;
+}
+
+
+
+CFG_Elias::CFG_Elias(const vector<string> &v, const vector<string> &t, const string &startsymbol,
          const map<string, vector<vector<string>>> &productionRules) : V(v), T(t), startsymbol(startsymbol),
                                                                        production_rules(productionRules) {
 
 }
 
-void CFG::add_augmented_productions() {
-    /// we add a new startsymbol
-    string new_startsymbool = startsymbol + "'";
-    vector<vector<string>> rules;
-    // making an augmented production by adding •
-    vector<string> rule = {"•", startsymbol};
-    rules.push_back(rule);
-    production_rules[new_startsymbool] = rules;
-    startsymbol = new_startsymbool;
-
-    // making an augmented production by adding • to all the productions
-    for (map<string, vector<vector<string>>>::iterator it = production_rules.begin();
-         it != production_rules.end(); it++) {
-        for (int i = 0; i < production_rules[(*it).first].size(); i++) {
-            // uitzondering voor epsilon productions
-            if (production_rules[(*it).first][i][0] == "") {
-                cout << "bij deze key: " << (*it).first << endl;
-                production_rules[(*it).first][i] = {"•"};
-            } else {
-                production_rules[(*it).first][i].insert(production_rules[(*it).first][i].begin(), "•");
-            }
-        }
-    }
-}
 
 /// ---------------TO-CNF--------------------
 /***
@@ -135,7 +143,6 @@ void CFG::add_augmented_productions() {
  * @param V (nonterminals)
  * @return vector of all nullable productions
  */
-
 vector<string> get_nullables(map<string, vector<vector<string>>> production_rules,vector<string> V){
     vector<string> nullables;
     vector<string> temp_nullables = {""};
@@ -312,9 +319,9 @@ vector<string> get_reachable_symbols(map<string, vector<vector<string>>> product
     return reachable;
 }
 
-void CFG::toCNF(){
+void CFG_Elias::toCNF(){
 
-    cout << "Original CFG:" << endl << endl;
+    cout << "Original CFG_Elias:" << endl << endl;
     this->print();
     cout << endl << "-------------------------------------" << endl << endl;
 
@@ -706,7 +713,7 @@ void CFG::toCNF(){
     sort(V.begin(), V.end());
 
     cout << " >> Broke "<< broken_bodies <<" bodies, added " << addad_variables << " new variables" << endl;
-    cout << ">>> Result CFG:" << endl << endl;
+    cout << ">>> Result CFG_Elias:" << endl << endl;
     this->print();
 
 }
