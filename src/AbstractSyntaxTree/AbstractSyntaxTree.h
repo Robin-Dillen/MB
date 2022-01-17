@@ -20,9 +20,7 @@ public:
     explicit Error(std::string error_msg, type error_type): msg(std::move(error_msg)), error_type(error_type){};
     Error(const Error& other) noexcept: msg(other.msg), error_type(other.error_type){};
 
-    ~Error() noexcept override {
-
-    }
+    ~Error() noexcept override = default;
 
     const char *what() const noexcept override {
         return msg.c_str();
@@ -40,7 +38,7 @@ private:
         std::list<AbstractSyntaxTree<AData> *> children;
         AData data;
         unsigned int line_no;
-        Error error;
+        std::unique_ptr<Error> error = nullptr;
 
         AbstractSyntaxTree(AbstractSyntaxTree<AData> *parent, AData data, unsigned int line_no) : parent(parent), data(data), line_no(line_no) {
         }
@@ -53,7 +51,7 @@ private:
         explicit AbstractSyntaxTree(AData data, unsigned int line_no) : AbstractSyntaxTree(nullptr, data, line_no) {};
 
         explicit AbstractSyntaxTree(AData data, unsigned int line_no, const std::string& error_msg, const Error::type& error_type) : AbstractSyntaxTree(nullptr, data, line_no) {
-            error = Error(error_msg, error_type);
+            error = std::make_unique<Error>(error_msg, error_type);
         };
 
         AbstractSyntaxTree<AData> *getParent() const {
@@ -62,8 +60,8 @@ private:
 
         void appendChild(AbstractSyntaxTree<AData> *child) {
             child->setParent(this);
-            if (!child->error_msg.empty()){
-                throw error;
+            if (child->error){
+                throw Error(*child->error);
             }
             children.push_back(child);
         }
