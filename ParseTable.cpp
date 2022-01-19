@@ -39,7 +39,9 @@ ParseTable::ParseTable(const DFA &dfa) {
             if (state->getFinal())
                 table[state->getName()]["EOS"] = "accept";
             else {
-                std::string reduceRule = state->getContent().back();
+                //TODO
+                //std::string reduceRule = state->getContent().back();
+                std::string reduceRule = "todo";
                 reduceRule.pop_back();
                 for (std::pair<std::string, std::string> el: table[state->getName()]) {
                     if (foundInStringlist(el.first, Terminals)) {

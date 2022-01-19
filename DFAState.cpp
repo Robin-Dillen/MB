@@ -2,7 +2,7 @@
 
 #include <utility>
 
-DFAState::DFAState(std::string s, std::list<std::string> c, bool f) : name(std::move(s)), content(std::move(c)), final(f){}
+DFAState::DFAState(std::string s, std::map<std::string, std::vector<std::vector<std::string>>> c, bool f) : name(std::move(s)), content(std::move(c)), final(f){}
 
 DFAState::~DFAState() {
     transitions.clear();
@@ -20,8 +20,8 @@ DFAState *DFAState::getStateOnInput(const std::string& i) {
 }
 
 bool DFAState::containsFinalItem() {
-    if (content.size() == 1 && content.front().back() == '*')
-        return true;
-    else
+    //if (content.size() == 1 && content.front().back() == '*')
+    //    return true;
+    //else
         return false;
 }

@@ -8,6 +8,7 @@
 #include <list>
 #include <vector>
 #include <string>
+#include <map>
 #include <iostream>
 #include "CFGVariable.h"
 #include "json.hpp"
@@ -25,7 +26,7 @@ public:
 
     Variable *getStartSymbole() const;
 
-    vector<Variable*> getClosure(string variable);
+    void getClosure(string variable, vector<Variable*> &closure);
 
 private:
     vector<string> terminals;

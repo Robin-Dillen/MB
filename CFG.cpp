@@ -141,10 +141,27 @@ Variable *CFG::getStartSymbole() const {
     return startSymbole;
 }
 
-vector<Variable*> CFG::getClosure(string variable) {
-    /*if (std::find(variables.begin(), variables.end(), variable) != variables.end())
-    {
-        cout<<"oki";
-    } else return {};
-    */
+void CFG::getClosure(string variable, vector<Variable*> &closure) {
+    if(variables.find(variable) == variables.end()) return;
+    if(closure.empty()) closure.push_back(variables[variable]);
+
+    vector<vector<string>> prods = variables[variable]->getProductions();
+    for(auto it1 = prods.begin(); it1 != prods.end(); it1++){
+        vector<string> prod = *it1;
+        for(auto it2 = prod.begin(); it2 != prod.end(); it2++){
+            if(variables.find(*it2) == variables.end()) continue;
+            bool found = false;
+            for(int i = 0; i < closure.size(); i++){
+                if(closure[i]->getName() == *it2){
+                    found = true;
+                    break;
+                }
+            }
+            if(!found){
+                closure.push_back(variables[*it2]);
+                getClosure(*it2,closure);
+            }
+        }
+    }
+    return;
 }
