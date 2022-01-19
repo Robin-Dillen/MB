@@ -20,7 +20,7 @@ void Parser::canonicalCollection() {
 
 }
 
-map<string, vector<vector<string>>> Parser::varsToProds(vector<Variable *> &variables) {
+map<string, vector<vector<string>>> Parser::varsToProds(const vector<Variable *> &variables) {
     map<string, vector<vector<string>>> prods;
     for(auto it : variables){
         prods[it->getName()] = it->getProductions();
@@ -66,7 +66,7 @@ void Parser::moveLocSym(map<string, vector<vector<string>>> &prods) {
     }
 }
 
-void Parser::getClosure(DFAState *rootState, map<string, vector<vector<string>>> &prods) {
+void Parser::getClosure(const DFAState *rootState, map<string, vector<vector<string>>> &prods) {
     map<string, vector<vector<string>>> closure;
     for(auto mapItem = prods.begin(); mapItem != prods.end(); mapItem++){
         for(auto i = 0; i < mapItem->second.size(); i++){
@@ -91,7 +91,7 @@ void Parser::getClosure(DFAState *rootState, map<string, vector<vector<string>>>
     }
 }
 
-void Parser::getClosure(DFAState *rootstate, string item, map<string, vector<vector<string>>> &closure) {
+void Parser::getClosure(const DFAState *rootstate, string item, map<string, vector<vector<string>>> &closure) {
     map<string, vector<vector<string>>> root = rootstate->getContent();
     if(root.find(item) == root.end()) return;
     vector<vector<string>> prods = root[item];
@@ -104,7 +104,7 @@ void Parser::getClosure(DFAState *rootstate, string item, map<string, vector<vec
     }
 }
 
-map<string, vector<vector<string>>> Parser::goTo(DFAState *rootState, string s) {
+map<string, vector<vector<string>>> Parser::goTo(const DFAState *rootState, string s) {
     map<string, vector<vector<string>>> newStateProductions;
     for(auto mapItem : rootState->getContent()){
         for(auto production : mapItem.second){
@@ -119,14 +119,14 @@ map<string, vector<vector<string>>> Parser::goTo(DFAState *rootState, string s) 
     return newStateProductions;
 }
 
-int Parser::checkSymLoc(vector<string> &production) {
+int Parser::checkSymLoc(const vector<string> &production) {
     for(int i = 0; i < production.size(); i++){
         if(production[i] == locSymbole) return i;
     }
     return -1;
 }
 
-DFAState* Parser::stateExists(map<string, vector<vector<string>>> &prods) {
+DFAState* Parser::stateExists(const map<string, vector<vector<string>>> &prods) {
     for(auto it : dfaStates){
         if(it->getContent() == prods){
             return it;
