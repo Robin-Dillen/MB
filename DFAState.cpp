@@ -2,7 +2,12 @@
 
 #include <utility>
 
-DFAState::DFAState(std::string s, std::map<std::string, std::vector<std::vector<std::string>>> c, bool f) : name(std::move(s)), content(std::move(c)), final(f){}
+DFAState::DFAState(std::string s, std::map<std::string, std::vector<std::vector<std::string>>> c, bool f) : name(std::move(s)), content(std::move(c)){
+    if (content.size() == 1 && content.begin()->first.back() == '\'' && content.begin()->second.size() == 1 && content.begin()->second.front().back() == ".")
+        final = true;
+    else
+        final = f;
+}
 
 DFAState::~DFAState() {
     transitions.clear();

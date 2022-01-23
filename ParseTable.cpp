@@ -36,7 +36,7 @@ ParseTable::ParseTable(const DFA &dfa) {
                     colWidth = entry.size() + 2;
             }
             //state to state on VAR => GO TO
-            if (found(trans.first, variables)) {
+            if (found(trans.first, variables) && trans.first.back() != '\'') {
                 std::string entry = trans.second->getName();
                 table[state->getName()][trans.first] = entry;
                 if (colWidth < entry.size() + 2)
@@ -50,12 +50,15 @@ ParseTable::ParseTable(const DFA &dfa) {
                 if (colWidth < 8)
                     colWidth = 8;
             }
-
             else {
-                //TODO
-                //std::string reduceRule = state->getContent().back();
-                std::string reduceRule = "todo";
-                reduceRule.pop_back();
+                std::string reduceRule;
+                std::vector<string> reduceProd = state->getContent().begin()->second.front();
+                reduceRule += state->getContent().begin()->first;
+                reduceRule += " -> ";
+                for (const std::string& el : reduceProd) {
+                    if (el != locSymbole)
+                        reduceRule += el;
+                }
                 for (std::pair<std::string, std::string> el: table[state->getName()]) {
                     if (found(el.first, terminals)) {
                         table[state->getName()][el.first] = reduceRule;
@@ -82,9 +85,13 @@ void ParseTable::printTable() {
         std::cout << " " + t + std::string(colWidth - t.size() - 1, ' ') + "|";
         lineString += std::string(colWidth, '_') + "|";
     }
+    std::cout << " EOS" + std::string(colWidth - 4, ' ') + "|";
+    lineString += std::string(colWidth, '_') + "|";
     for (const std::string& v: variables) {
-        std::cout << " " + v + std::string(colWidth - v.size() - 1, ' ') + "|";
-        lineString += std::string(colWidth, '_') + "|";
+        if (v.back() != '\''){
+            std::cout << " " + v + std::string(colWidth - v.size() - 1, ' ') + "|";
+            lineString += std::string(colWidth, '_') + "|";
+        }
     }
     std::cout << "\n";
     lineString += "\n";
@@ -92,9 +99,17 @@ void ParseTable::printTable() {
 
     for (const auto& row : table) {
         std::cout << " " + row.first + std::string(colWidth - row.first.size() - 1, ' ') + "|";
-        for (const auto& entry : row.second) {
-            std::cout << " " + entry.second + std::string(colWidth - row.first.size() - 1, ' ') + "|";
+
+        for (const std::string& col : terminals){
+            std::cout << " " + row.second.at(col) + std::string(colWidth - row.second.at(col).size() - 1, ' ') + "|";
         }
+        std::cout << " " + row.second.at("EOS") + std::string(colWidth - row.second.at("EOS").size() - 1, ' ') + "|";
+        for (const std::string& col : variables){
+            if (col.back() != '\'') {
+                std::cout << " " + row.second.at(col) + std::string(colWidth - row.second.at(col).size() - 1, ' ') + "|";
+            }
+        }
+
         std::cout << "\n";
         std::cout << lineString;
     }

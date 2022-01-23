@@ -20,6 +20,7 @@ public:
     std::string getName() const{return name;}
     std::map<std::string, std::vector<std::vector<std::string>>> getContent() const{return content;}
     bool getFinal() const{return final;}
+    void setFinal(bool b) {final = b;}
     std::map<std::string, DFAState*> getTransitions() const{return transitions;}
     bool containsFinalItem(const std::string& locSymb);
 };

@@ -2,7 +2,7 @@
 #include "Parser.h"
 
 Parser::Parser() {
-    cfg = new CFG("CFG's/CFG_test2.json");
+    cfg = new CFG("CFG's/CFG_2_0.json");
     cfg->add_augmented_productions(locSymbole);
     canonicalCollection();
 }
