@@ -20,28 +20,17 @@ inline bool found(const std::string& s, const std::vector<std::string>& vec){
     return found;
 }
 
-//bool foundVariable(const std::string& s, const std::map<std::string, Variable*>& vars){
-//    bool found = false;
-//    for (const auto& el : vars) {
-//        if (el.first == s){
-//            found = true;
-//            break;
-//        }
-//    }
-//    return found;
-//}
-
 class ParseTable {
     std::vector<std::string> terminals;
     std::vector<std::string> variables;
     std::list<std::string> States;
     std::map<std::string, std::map<std::string, std::string>> table;
     std::string locSymbole = ".";
-    unsigned int colWidth = 3;
+    std::map<string, unsigned int> colWidths;
 public:
     explicit ParseTable(const DFA& dfa);
     std::map<std::string, std::map<std::string, std::string>> getTable() const;
-    void printTable();
+    void printTableToFile(std::ofstream& out);
 };
 
 

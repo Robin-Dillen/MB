@@ -2,6 +2,7 @@
 // Created by Khemin on 11-12-2021.
 //
 
+#include <fstream>
 #include "ParseTable.h"
 
 ParseTable::ParseTable(const DFA &dfa) {
@@ -11,15 +12,20 @@ ParseTable::ParseTable(const DFA &dfa) {
         variables.push_back(el.first);
     }
 
+    colWidths["Column1"] = 5;
+
     //Generates the table with empty elements;
     for (DFAState* state : dfa.getStates()) {
         std::map<std::string, std::string> row;
         for (const std::string& t : terminals) {
             row[t];
+            colWidths[t] = t.size() + 2;
         }
         row["EOS"];
+        colWidths["EOS"] = 5;
         for (const auto& v : variables) {
             row[v];
+            colWidths[v] = v.size() + 2;
         }
         States.push_back(state->getName());
         table[state->getName()] = row;
@@ -32,23 +38,23 @@ ParseTable::ParseTable(const DFA &dfa) {
             if (found(trans.first, terminals)) {
                 std::string entry = "shift " + trans.second->getName();
                 table[state->getName()][trans.first] = entry;
-                if (colWidth < entry.size() + 2)
-                    colWidth = entry.size() + 2;
+                if (colWidths[trans.first] < entry.size() + 2)
+                    colWidths[trans.first] = entry.size() + 2;
             }
             //state to state on VAR => GO TO
             if (found(trans.first, variables) && trans.first.back() != '\'') {
                 std::string entry = trans.second->getName();
                 table[state->getName()][trans.first] = entry;
-                if (colWidth < entry.size() + 2)
-                    colWidth = entry.size() + 2;
+                if (colWidths[trans.first] < entry.size() + 2)
+                    colWidths[trans.first] = entry.size() + 2;
             }
         }
         //state contains final item vb A -> a A * => reduce operation/ write rule
         if (state->containsFinalItem(locSymbole)) {
             if (state->getFinal()){
                 table[state->getName()]["EOS"] = "accept";
-                if (colWidth < 8)
-                    colWidth = 8;
+                if (colWidths["EOS"] < 8)
+                    colWidths["EOS"] = 8;
             }
             else {
                 std::string reduceRule;
@@ -56,18 +62,22 @@ ParseTable::ParseTable(const DFA &dfa) {
                 reduceRule += state->getContent().begin()->first;
                 reduceRule += " -> ";
                 for (const std::string& el : reduceProd) {
-                    if (el != locSymbole)
-                        reduceRule += el;
-                }
-                for (std::pair<std::string, std::string> el: table[state->getName()]) {
-                    if (found(el.first, terminals)) {
-                        table[state->getName()][el.first] = reduceRule;
-                        if (colWidth < reduceRule.size() + 2)
-                            colWidth = reduceRule.size() + 2;
+                    if (el != locSymbole){
+                        reduceRule += el + " ";
                     }
                 }
-                if (table[state->getName()]["EOS"].empty())
+                for (std::pair<std::string, std::string> el : table[state->getName()]) {
+                    if (found(el.first, terminals)) {
+                        table[state->getName()][el.first] = reduceRule;
+                        if (colWidths[el.first] < reduceRule.size() + 1)
+                            colWidths[el.first] = reduceRule.size() + 1;
+                    }
+                }
+                if (table[state->getName()]["EOS"].empty()){
                     table[state->getName()]["EOS"] = reduceRule;
+                    if (colWidths["EOS"] < reduceRule.size() + 1)
+                        colWidths["EOS"] = reduceRule.size() + 1;
+                }
             }
         }
     }
@@ -77,40 +87,38 @@ std::map<std::string, std::map<std::string, std::string>> ParseTable::getTable()
     return table;
 }
 
-void ParseTable::printTable() {
+void ParseTable::printTableToFile(std::ofstream& out) {
     std::string lineString;
-    std::cout << std::string(colWidth, ' ') + "|";
-    lineString += std::string(colWidth, '_') + "|";
-    for (const std::string& t : terminals) {
-        std::cout << " " + t + std::string(colWidth - t.size() - 1, ' ') + "|";
-        lineString += std::string(colWidth, '_') + "|";
+    out << std::string(colWidths["Column1"], ' ') + "|";
+    lineString += std::string(colWidths["Column1"], '_') + "|";
+    for (std::string& t : terminals) {
+        out << " " + t + std::string(colWidths[t] - t.size() - 1, ' ') + "|";
+        lineString += std::string(colWidths[t], '_') + "|";
     }
-    std::cout << " EOS" + std::string(colWidth - 4, ' ') + "|";
-    lineString += std::string(colWidth, '_') + "|";
-    for (const std::string& v: variables) {
+    out << " EOS" + std::string(colWidths["EOS"] - 4, ' ') + "|";
+    lineString += std::string(colWidths["EOS"], '_') + "|";
+    for (std::string& v: variables) {
         if (v.back() != '\''){
-            std::cout << " " + v + std::string(colWidth - v.size() - 1, ' ') + "|";
-            lineString += std::string(colWidth, '_') + "|";
+            out << " " + v + std::string(colWidths[v] - v.size() - 1, ' ') + "|";
+            lineString += std::string(colWidths[v], '_') + "|";
         }
     }
-    std::cout << "\n";
-    lineString += "\n";
-    std::cout << lineString;
+    out << std::endl;
+    out << lineString << std::endl;
 
-    for (const auto& row : table) {
-        std::cout << " " + row.first + std::string(colWidth - row.first.size() - 1, ' ') + "|";
+    for (auto& row : table) {
+        out << " " + row.first + std::string(colWidths["Column1"] - row.first.size() - 1, ' ') + "|";
 
-        for (const std::string& col : terminals){
-            std::cout << " " + row.second.at(col) + std::string(colWidth - row.second.at(col).size() - 1, ' ') + "|";
+        for (std::string& col : terminals){
+            out << " " + row.second.at(col) + std::string(colWidths[col] - row.second.at(col).size() - 1, ' ') + "|";
         }
-        std::cout << " " + row.second.at("EOS") + std::string(colWidth - row.second.at("EOS").size() - 1, ' ') + "|";
-        for (const std::string& col : variables){
+        out << " " + row.second.at("EOS") + std::string(colWidths["EOS"] - row.second.at("EOS").size() - 1, ' ') + "|";
+        for (std::string& col : variables){
             if (col.back() != '\'') {
-                std::cout << " " + row.second.at(col) + std::string(colWidth - row.second.at(col).size() - 1, ' ') + "|";
+                out << " " + row.second.at(col) + std::string(colWidths[col] - row.second.at(col).size() - 1, ' ') + "|";
             }
         }
-
-        std::cout << "\n";
-        std::cout << lineString;
+        out << std::endl;
+        out << lineString << std::endl;
     }
 }

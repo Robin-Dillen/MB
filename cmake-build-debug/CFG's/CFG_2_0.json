@@ -22,7 +22,7 @@
     {"head": "ASSIGN", "body": ["inplace", "FUNCIONNAME", "ARGUMENT", "semicolon"]},
     {"head": "ASSIGN", "body": ["FUNCIONNAME", "ARGUMENT", "semicolon"]},
     {"head": "ASSIGN", "body": ["IDENTIFIER", "OPERATION", "DIGIT", "semicolon"]},
-    {"head": "ASSIGN", "body": ["const ","IDENTIFIER", "OPERATION", "DIGIT", "semicolon"]},
+    {"head": "ASSIGN", "body": ["const","IDENTIFIER", "OPERATION", "DIGIT", "semicolon"]},
     {"head": "ASSIGN", "body": ["print", "lparen", "IDENTIFIERT", "rparen", "semicolon"]},
     {"head": "ARGUMENT", "body": ["ARGUMENT", "comma", "ARGUMENT"]},
     {"head": "ARGUMENT", "body": ["IDENTIFIER"]},
