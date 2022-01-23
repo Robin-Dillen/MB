@@ -21,7 +21,7 @@ public:
     std::map<std::string, std::vector<std::vector<std::string>>> getContent() const{return content;}
     bool getFinal() const{return final;}
     std::map<std::string, DFAState*> getTransitions() const{return transitions;}
-    bool containsFinalItem();
+    bool containsFinalItem(const std::string& locSymb);
 };
 
 

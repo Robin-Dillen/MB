@@ -25,6 +25,8 @@ public:
     void add_augmented_productions(string locSymbol);
 
     Variable *getStartSymbole() const;
+    vector<string> getTerminals(){ return terminals;}
+    map<string, Variable*> getVariables(){ return variables;}
 
     void getClosure(string variable, vector<Variable*> &closure);
 

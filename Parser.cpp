@@ -151,3 +151,9 @@ void Parser::printState(map<string, vector<vector<string>>> prods){
     }
     cout<<endl;
 }
+
+ParseTable Parser::getParseTable() {
+    DFA dfa = DFA(dfaStates, cfg->getTerminals(), cfg->getVariables());
+
+    return ParseTable(dfa);
+}

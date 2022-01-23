@@ -19,9 +19,12 @@ DFAState *DFAState::getStateOnInput(const std::string& i) {
         return nullptr;
 }
 
-bool DFAState::containsFinalItem() {
-    //if (content.size() == 1 && content.front().back() == '*')
-    //    return true;
-    //else
-        return false;
+bool DFAState::containsFinalItem(const std::string& locSymb) {
+    if (content.size() == 1) {
+        for (const auto& prods : content)
+            if (prods.second.size() == 1 && prods.second.front().back() == locSymb)
+                return true;
+    }
+
+    return false;
 }

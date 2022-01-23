@@ -5,6 +5,8 @@
 
 int main(){
     Parser p;
+    ParseTable table = p.getParseTable();
+    table.printTable();
 
 
 //    Py_SetPythonHome(L"C:/Users/nibor/AppData/Local/Programs/Python/Python39");

@@ -6,6 +6,7 @@
 #include <vector>
 #include <list>
 #include "DFAState.h"
+#include "CFGVariable.h"
 
 class DFAState;
 class DFA {
@@ -13,23 +14,23 @@ private:
     DFAState* currentState;
     DFAState* startState;
     std::vector<DFAState*> states;
-    std::list<std::string> alphabet;
+    vector<std::string> terminals;
+    map<std::string, Variable*> variables;
 public:
     DFA(){ currentState = nullptr; startState = nullptr; states = std::vector<DFAState*>();};
-    template<typename T> DFA(std::vector<T> canSet, const std::list<std::string>& alphabet);
+    DFA(const std::vector<DFAState*>& stateSet, const vector<std::string>& terms, const map<std::string, Variable*>& vars);
     ~DFA();
 
     bool addState(DFAState* s);
 
     DFAState* getState(const std::string& n) const;
-    DFAState* getCurrentState() const{return currentState;};
-    void setCurrentState(DFAState* s){ currentState = s;};
-    DFAState* getStartState(){return startState;};
-    void setStartState(DFAState* s){ startState = s;};
-    std::list<std::string> getAlphabet(){return alphabet;};
-    void setAlphabet(std::list<std::string> l){alphabet = std::move(l);};
-    std::vector<DFAState*> getStates() const{return states;};
-    std::map<std::string, std::list<std::string>> getVarandTerm() const;
+    DFAState* getCurrentState() const { return currentState; };
+    void setCurrentState(DFAState* s){ currentState = s; };
+    DFAState* getStartState() const { return startState; };
+    void setStartState(DFAState* s){ startState = s; };
+    vector<string> getTerminals() const { return terminals; }
+    map<string, Variable*> getVariables() const { return variables; }
+    std::vector<DFAState*> getStates() const { return states; };
 };
 
 

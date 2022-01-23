@@ -1,9 +1,14 @@
 #include "DFA.h"
 
-template<typename T>
-DFA::DFA(std::vector<T> canSet, const std::list<std::string>& alphabet) {
-    //One state per set of LR items
-    //Transitions on VAR or TERM based on Closure()
+DFA::DFA(const std::vector<DFAState*>& stateSet, const vector<std::string>& terms, const map<std::string, Variable*>& vars) : terminals(terms), variables(vars){
+    states = std::vector<DFAState*>();
+    for (DFAState* state : stateSet) {
+        states.push_back(state);
+        if (state->getName() == "IO") {
+            startState = state;
+        }
+    }
+    currentState = startState;
 }
 
 DFA::~DFA() {
@@ -31,30 +36,4 @@ DFAState *DFA::getState(const std::string& n) const{
             return it;
     }
     return nullptr;
-}
-
-std::map<std::string, std::list<std::string>> DFA::getVarandTerm() const{
-    std::map<std::string, std::list<std::string>> result;
-
-    for (DFAState* state : states) {
-        for (std::pair<std::string, DFAState*> trans : state->getTransitions()) {
-            result["Variables"].push_back(trans.first);
-        }
-    }
-
-    for (const std::string& el : alphabet) {
-        bool found = false;
-
-        for (const std::string& VAR : result["Variables"]) {
-            if (VAR == el) {
-                found = true;
-            }
-        }
-
-        if (!found) {
-            result["Terminals"].push_back(el);
-        }
-    }
-
-    return result;
 }

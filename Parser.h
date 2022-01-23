@@ -6,12 +6,14 @@
 #include "CFGVariable.h"
 #include "DFA.h"
 #include "DFAState.h"
+#include "ParseTable.h"
 #include <algorithm>
 
 class Parser {
 public:
     Parser();
     void printState(map<string, vector<vector<string>>> prods);
+    ParseTable getParseTable();
 private:
     void canonicalCollection();
     map<string, vector<vector<string>>> varsToProds(const vector<Variable*> &variables);
