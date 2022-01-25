@@ -2,9 +2,11 @@
 #include "src/Data.h"
 #include <iostream>
 #include "Parser.h"
+#include "CFG.h"
 
 int main(){
-    Parser p;
+    CFG* cfg = new CFG("idk");
+    Parser p(cfg);
     ParseTable table = p.getParseTable();
 
     ofstream file;

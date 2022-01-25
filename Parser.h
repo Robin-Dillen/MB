@@ -11,7 +11,7 @@
 
 class Parser {
 public:
-    Parser();
+    Parser(CFG* c);
     void printState(map<string, vector<vector<string>>> prods);
     ParseTable getParseTable();
 private:
