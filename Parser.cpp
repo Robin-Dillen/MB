@@ -1,8 +1,8 @@
 
 #include "Parser.h"
 
-Parser::Parser() {
-    cfg = new CFG("CFG's/CFG_2_0.json");
+Parser::Parser(CFG* c) {
+    cfg = c;
     cfg->add_augmented_productions(locSymbole);
     canonicalCollection();
 }
