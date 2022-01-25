@@ -1,4 +1,6 @@
-inplace clear: Aux, Tomorrow;
+import clear;
+
+inplace clear Aux, Tomorrow;
 while Today != 0 {
     incr Aux;
     decr Today;
