@@ -6,14 +6,17 @@
 #include <algorithm>
 #include <cmath>
 
-enum TokenType {
-    while_, incr_, decr_, print_, import_, identifier_, number_, operator_, lparen_, rparen_, lbrace_, rbrace_, semicolon_, colon_, comma_, inplace_, filename_, const_
-};
+namespace Lexer_elements {
+    enum TokenType {
+        while_, incr_, decr_, print_, import_, identifier_, number_, operator_, lparen_, rparen_, lbrace_,
+        rbrace_, semicolon_, colon_, comma_, inplace_, filename_, const_, newline_
+    };
+}
 
-struct Token{
-    Token(TokenType type, const std::string &value);
+struct Token {
+    Token(Lexer_elements::TokenType type, const std::string &value);
 
-    TokenType type;
+    Lexer_elements::TokenType type;
     std::string value;
 };
 
@@ -31,7 +34,7 @@ public:
 
 private:
 
-    std::string getTokenName(const Token& token) const ;
+    std::string getTokenName(const Token &token) const;
 
     std::vector<Token> Tokens;
 };

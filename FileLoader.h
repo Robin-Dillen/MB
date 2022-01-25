@@ -15,7 +15,7 @@ public:
     FileLoader(const std::string &filename);
 
     /// returnes the content of the file (type: std::basic_string<char>)
-    std::string getFilecontents(const std::vector<char> & exeptions) const;
+    std::string getFilecontents(const std::vector<char> & exeptions = {}) const;
 
 private:
 

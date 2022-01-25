@@ -1,7 +1,7 @@
 {
   "Variables": ["ROOT","ASSIGN", "LOOP", "BODY", "FUNCIONNAME", "NON_DIGIT", "CONDITION", "DIGIT", "OPERATION", "ARGUMENT", "IMPORT"],
   "Terminals": ["while", "incr", "decr", "print", "import", "identifier", "number", "operator", "lparen", "rparen", "lbrace", "rbrace", "semicolon",
-  "comma", "inplace", "filename", "const"
+  "comma", "inplace", "filename", "const", ">" ,"<", "=", "!=", "==",">=", "<="
   ],
   "Productions": [
     {"head": "ROOT", "body": ["IMPORT","BODY"]},
@@ -33,6 +33,13 @@
     {"head": "IDENTIFIER", "body": ["identifier"]},
     {"head": "FUNCIONNAME", "body": ["filename"]},
     {"head": "OPERATION", "body": ["operator"]},
+    {"head": "OPERATION", "body": ["<"]},
+    {"head": "OPERATION", "body": [">"]},
+    {"head": "OPERATION", "body": ["="]},
+    {"head": "OPERATION", "body": ["!="]},
+    {"head": "OPERATION", "body": ["=="]},
+    {"head": "OPERATION", "body": ["<="]},
+    {"head": "OPERATION", "body": [">="]},
     {"head": "DIGIT", "body": ["number"]}
   ],
   "Start": "ROOT"

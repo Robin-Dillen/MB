@@ -1,6 +1,7 @@
 
 #include "Lexer.h"
 
+using namespace Lexer_elements;
 /// struct
 Token::Token(TokenType type, const std::string &value) : type(type), value(value) {}
 
@@ -19,8 +20,16 @@ void Lexer::tokenize(const std::string &str) {
     std::string punctStr;
 
     bool readfunction = false;
+    int count = 1;
 
     for (const char Char: str) {
+
+
+        // check for new line
+        if (Char == '\n') {
+            Tokens.push_back(Token(newline_, std::to_string(count)));
+            count += 1;
+        }
 
         if (isalpha(Char)) { // identifier: [a-zA-Z][a-zA-Z]*
             /// check if we just stopped reading a number
@@ -219,6 +228,8 @@ std::string Lexer::getTokenName(const Token& token) const{
             return "const";
         case import_:
             return "import";
+        case newline_:
+            return "newline";
         default:
             return "unknownType";
     }
