@@ -1,0 +1,4 @@
+import double;
+
+Integer = 10
+inplace double Integer;

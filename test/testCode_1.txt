@@ -1,0 +1,9 @@
+import double;
+
+Counter = 15;
+inplace double Counter;
+print(Counter);
+while 7 < Counter {
+    decr Counter;
+}
+print(Counter);

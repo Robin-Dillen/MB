@@ -1,0 +1,6 @@
+Counter = 3;
+tijdens Counter != 0 {
+    min Negative;
+    plus Positive;
+    decr Counter;
+}

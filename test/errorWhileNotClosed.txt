@@ -1,0 +1,2 @@
+while Counter < 5 {
+    incr Counter;
