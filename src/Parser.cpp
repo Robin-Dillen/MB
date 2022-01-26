@@ -17,7 +17,7 @@ void Parser::canonicalCollection() {
     vector<Variable *> variables = {};
     cfg->getClosure(start->getName(), variables);
     map<string, vector<vector<string>>> productions = varsToProds(variables);
-    DFAState *stateZero = new DFAState("I0", productions, false);
+    DFAState *stateZero = new DFAState("0", productions, false);
     dfaStates.push_back(stateZero);
     printState(productions);
     create_canonical_states(stateZero);
@@ -45,7 +45,7 @@ void Parser::create_canonical_states(DFAState *rootState) {
                     rootState->addTransition(production[i + 1], existingState);
                 } else {
 
-                    string name = "I" + to_string(dfaStates.size());
+                    string name = to_string(dfaStates.size());
                     DFAState *state = new DFAState(name, newStateProductions, false);
                     dfaStates.push_back(state);
                     rootState->addTransition(production[i + 1], state);
@@ -77,7 +77,6 @@ void Parser::getClosure(const DFAState *rootState, map<string, vector<vector<str
             int j = checkSymLoc(mapItem->second[i]);
             if (mapItem->second[i].size() - 1 > j) {
                 getClosure(rootState, mapItem->second[i][j + 1], closure);
-
             }
         }
     }
@@ -99,10 +98,11 @@ void Parser::getClosure(const DFAState *rootstate, string item, map<string, vect
     if (root.find(item) == root.end()) return;
     vector<vector<string>> prods = root[item];
     closure[item] = prods;
-    for (auto it1 = prods.begin(); it1 != prods.end(); it1++) {
-        for (auto it2 = it1->begin(); it2 != it1->end(); it2++) {
-            if (closure.find(*it2) != closure.end()) continue;
-            getClosure(rootstate, *it2, closure);
+    for (int j = 0; j < prods.size(); j++) {
+        int i = checkSymLoc(prods[j]);
+        if(i < prods[j].size()-1){
+            if (closure.find(prods[j][i+1]) != closure.end()) continue;
+            getClosure(rootstate, prods[j][i+1], closure);
         }
     }
 }

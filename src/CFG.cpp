@@ -13,47 +13,6 @@
 using json = nlohmann::json;
 using namespace std;
 
-//function that return true if a given vector is bigger than an other given vector.
-bool isBigger(vector<string> v1, vector<string> v2) {
-    if (v1.empty() || v1[0] < v2[0]) {
-        return false;
-    } else if (v2.empty()) {
-        return true;
-    } else if (v1[0] == v2[0]) {
-        auto temp = v1.begin();
-        advance(temp, 1);
-        vector<string> v3(temp, v1.end());
-        temp = v2.begin();
-        advance(temp, 1);
-        vector<string> v4(temp, v2.end());
-        //check next indexes to decide which is bigger
-        return isBigger(v3, v4);
-    }
-    return true;
-}
-
-//function that sort a vector of vectors of strings with bubble sort algoritm.
-void bubbleSort(vector<vector<string>> &productions) {
-    for (int i = 0; i < productions.size(); i++) {
-        for (int j = i + 1; j < productions.size(); j++) {
-            if (productions[i].empty()) continue;
-            if (isBigger(productions[i], productions[j]) || productions[j].empty()) {
-                swap(productions[i], productions[j]);
-            }
-        }
-    }
-}
-
-//function that sort a vector of strings with bubble sort algoritm
-void bubbleSort(vector<string> &symbols) {
-    for (int i = 0; i < symbols.size(); i++) {
-        for (int j = i + 1; j < symbols.size(); j++) {
-            if (symbols[i] <= symbols[j]) continue;
-            swap(symbols[i], symbols[j]);
-        }
-    }
-}
-
 //constructor
 CFG::CFG(string jsonfile) {
     ifstream input(jsonfile);
@@ -78,7 +37,7 @@ CFG::CFG(string jsonfile) {
                 productions.push_back(j_productions[k]["body"].get<vector<string>>());
             }
         }
-        bubbleSort(productions);
+        std::sort(productions.begin(), productions.end());
         Variable *v = new Variable(productions, variable_strings[i]);
         variables[variable_strings[i]] = v;
         if (variable_strings[i] == j_start) startSymbole = v;
@@ -109,7 +68,6 @@ void CFG::print() {
     cout << "P = {" << endl;
     for (auto it = variables.begin(); it != variables.end(); it++) {
         vector<vector<string>> productions = it->second->getProductions();
-        bubbleSort(productions);
         for (int j = 0; j < productions.size(); j++) {
             string production;
             for (int k = 0; k < productions[j].size(); k++) {
