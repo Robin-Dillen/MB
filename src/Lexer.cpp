@@ -1,9 +1,11 @@
 
 #include "Lexer.h"
+#include "lib.h"
 
-using namespace Lexer_elements;
-/// struct
-Token::Token(TokenType type, const std::string &value) : type(type), value(value) {}
+#include <iostream>
+#include <algorithm>
+#include <cmath>
+
 
 /// class Lexer
 Lexer::Lexer(const std::string &characterString) {
@@ -38,10 +40,9 @@ void Lexer::tokenize(const std::string &str) {
                 NumStr = "";
             }
 
-            if(readfunction){
+            if (readfunction) {
                 filenameStr += Char;
-            }
-            else{
+            } else {
                 IdentifierStr += Char;
             }
 
@@ -64,7 +65,7 @@ void Lexer::tokenize(const std::string &str) {
                 Tokens.push_back(Token(import_, IdentifierStr));
                 IdentifierStr = "";
                 readfunction = true;
-            } else if (std::find(filenames.begin(), filenames.end(), IdentifierStr) != filenames.end()){
+            } else if (std::find(filenames.begin(), filenames.end(), IdentifierStr) != filenames.end()) {
                 Tokens.push_back(Token(filename_, IdentifierStr));
                 IdentifierStr = "";
             }
@@ -90,7 +91,7 @@ void Lexer::tokenize(const std::string &str) {
                 Tokens.push_back(Token(identifier_, IdentifierStr));
                 IdentifierStr = "";
             }
-                /// check if we just stopped reading a number
+            /// check if we just stopped reading a number
             if (!NumStr.empty()) {
                 Tokens.push_back(Token(number_, NumStr));
                 NumStr = "";
@@ -145,8 +146,7 @@ void Lexer::tokenize(const std::string &str) {
                 Tokens.push_back(Token(colon_, punctStr));
                 punctStr = "";
             }
-        }
-        else{
+        } else {
             /// check if we just stopped reading an IdentifierStr
             if (!IdentifierStr.empty()) {
                 Tokens.push_back(Token(identifier_, IdentifierStr));
@@ -172,14 +172,14 @@ void Lexer::printTokens() {
 
     for (Token token: Tokens) {
         std::cout << "[" << getTokenName(token) << "]";
-        for(int i = 0; i <= 1 - floor(((double)getTokenName(token).size()+2.0)/8.0); i++){
+        for (int i = 0; i <= 1 - floor(((double) getTokenName(token).size() + 2.0) / 8.0); i++) {
             std::cout << "\t";
         }
-        std::cout << "= " <<  token.value << std::endl;
+        std::cout << "= " << token.value << std::endl;
     }
 }
 
-void Lexer::printTokenString(){
+void Lexer::printTokenString() {
     for (Token token: Tokens) {
         std::cout << getTokenName(token) << "";
     }
@@ -190,7 +190,7 @@ const std::vector<Token> &Lexer::getTokens() const {
     return Tokens;
 }
 
-std::string Lexer::getTokenName(const Token& token) const{
+std::string Lexer::getTokenName(const Token &token) const {
     switch (token.type) {
         case while_:
             return "while";

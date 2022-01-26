@@ -7,26 +7,42 @@
 #include "DFA.h"
 #include "DFAState.h"
 #include "ParseTable.h"
-#include <algorithm>
+
+#include <string>
+#include <vector>
+#include <map>
 
 class Parser {
 public:
-    Parser(CFG* c);
-    void printState(map<string, vector<vector<string>>> prods);
+    Parser(CFG *c);
+
+    void printState(std::map<std::string, std::vector<std::vector<std::string>>> prods);
+
     ParseTable getParseTable();
+
 private:
     void canonicalCollection();
-    map<string, vector<vector<string>>> varsToProds(const vector<Variable*> &variables);
-    void create_canonical_states(DFAState* rootState);
-    int checkSymLoc(const vector<string> &production);
-    map<string, vector<vector<string>>> goTo(const DFAState* rootState,const string s);
-    void moveLocSym(map<string, vector<vector<string>>> &prods);
-    void getClosure(const DFAState* rootState, map<string, vector<vector<string>>> &prods);
-    void getClosure(const DFAState* rootstate, const string item, map<string, vector<vector<string>>> &closure);
-    DFAState* stateExists(const map<string, vector<vector<string>>> &prods);
-    CFG* cfg;
-    string locSymbole = ".";
-    vector<DFAState*> dfaStates;
+
+    std::map<std::string, std::vector<std::vector<std::string>>> varsToProds(const std::vector<Variable *> &variables);
+
+    void create_canonical_states(DFAState *rootState);
+
+    int checkSymLoc(const std::vector<std::string> &production);
+
+    std::map<std::string, std::vector<std::vector<std::string>>> goTo(const DFAState *rootState, std::string s);
+
+    void moveLocSym(std::map<std::string, std::vector<std::vector<std::string>>> &prods);
+
+    void getClosure(const DFAState *rootState, std::map<std::string, std::vector<std::vector<std::string>>> &prods);
+
+    void getClosure(const DFAState *rootstate, std::string item,
+                    std::map<std::string, std::vector<std::vector<std::string>>> &closure);
+
+    DFAState *stateExists(const std::map<std::string, std::vector<std::vector<std::string>>> &prods);
+
+    CFG *cfg;
+    std::string locSymbole{"."};
+    std::vector<DFAState *> dfaStates;
 };
 
 

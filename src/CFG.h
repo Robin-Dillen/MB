@@ -5,35 +5,32 @@
 #ifndef PROGRAMMEEROPDRACHT_CFG_H
 #define PROGRAMMEEROPDRACHT_CFG_H
 
-#include <list>
+#include "CFGVariable.h"
+
 #include <vector>
 #include <string>
 #include <map>
-#include <iostream>
-#include "CFGVariable.h"
-#include "json.hpp"
-#include <fstream>
-#include <algorithm>
-
-
-using namespace std;
 
 class CFG {
 public:
-    CFG(string json);
+    explicit CFG(std::string json);
+
     void print();
-    void add_augmented_productions(string locSymbol);
+
+    void add_augmented_productions(std::string locSymbol);
 
     Variable *getStartSymbole() const;
-    vector<string> getTerminals(){ return terminals;}
-    map<string, Variable*> getVariables(){ return variables;}
 
-    void getClosure(string variable, vector<Variable*> &closure);
+    std::vector<std::string> getTerminals() { return terminals; }
+
+    std::map<std::string, Variable *> getVariables() { return variables; }
+
+    void getClosure(std::string variable, std::vector<Variable *> &closure);
 
 private:
-    vector<string> terminals;
-    map<string,Variable*> variables;
-    Variable* startSymbole;
+    std::vector<std::string> terminals;
+    std::map<std::string, Variable *> variables;
+    Variable *startSymbole;
 };
 
 

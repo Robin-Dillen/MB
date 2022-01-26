@@ -2,20 +2,18 @@
 #ifndef MB_FILELOADER_H
 #define MB_FILELOADER_H
 
-#include <iostream>
-#include <fstream>
 #include <vector>
-#include <algorithm>
+#include <string>
 
 
 class FileLoader {
 
 public:
     /// constructor
-    FileLoader(const std::string &filename);
+    explicit FileLoader(const std::string &filename);
 
     /// returnes the content of the file (type: std::basic_string<char>)
-    std::string getFilecontents(const std::vector<char> & exeptions = {}) const;
+    std::string getFilecontents(const std::vector<char> &exeptions = {}) const;
 
 private:
 

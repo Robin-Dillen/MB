@@ -130,31 +130,16 @@ enum cmp_op {
 };
 
 enum TokenType {
-    while_,
-    incr_,
-    decr_,
-    print_,
-    import_,
-    identifier_,
-    number_,
-    operator_,
-    lparen_,
-    rparen_,
-    lbrace_,
-    rbrace_,
-    semicolon_,
-    colon_,
-    comma_,
-    inplace_,
-    filename_,
-    const_
+    while_, incr_, decr_, print_, import_, identifier_, number_, operator_, lparen_, rparen_, lbrace_,
+    rbrace_, semicolon_, colon_, comma_, inplace_, filename_, const_, newline_
 };
 
 struct Token {
-    Token(TokenType type, std::string value) : type(type), value(std::move(value)) {};
+    Token(TokenType type, const std::string &value) : type(type), value(value) {};
 
     TokenType type;
     std::string value;
 };
+
 
 #endif //MB_LIB_H
