@@ -1,8 +1,8 @@
 #include "src/Compiler.h"
 #include "src/Data.h"
-#include "FileLoader.h"
-#include "Lexer.h"
-#include "Parser.h"
+#include "src/FileLoader.h"
+#include "src/Lexer.h"
+#include "src/Parser.h"
 #include <iostream>
 
 int main(int argc, char **argv) {

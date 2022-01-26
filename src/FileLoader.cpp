@@ -5,7 +5,7 @@ FileLoader::FileLoader(const std::string &filename) {
     this->readfile(filename);
 }
 
-void FileLoader::readfile(const std::string &filename) {
+void FileLoader::readfile(const std::string &filename){
 
     char byte = 0;
 
@@ -24,7 +24,7 @@ void FileLoader::readfile(const std::string &filename) {
     input_file.close();
 }
 
-std::string FileLoader::getFilecontents(const std::vector<char> &exceptions) const {
+std::string FileLoader::getFilecontents(const std::vector<char> &exceptions) const{
     // Traverse the string
     std::string filecontents_ = filecontents;
     for (int i = 0; i < exceptions.size(); i++) {

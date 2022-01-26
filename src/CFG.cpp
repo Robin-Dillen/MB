@@ -5,7 +5,6 @@
 #include "CFG.h"
 
 using json = nlohmann::json;
-using namespace std;
 
 //function that return true if a given vector is bigger than an other given vector.
 bool isBigger(vector<string> v1, vector<string> v2) {
@@ -118,7 +117,7 @@ void CFG::print() {
         }
     }
     cout << "}" << endl;
-    cout << "S = " << startSymbole->getName() << endl;
+    cout << "S = " << startSymbole->getName()<<endl;
 }
 
 void CFG::add_augmented_productions(string locSymbol) {
@@ -133,7 +132,7 @@ void CFG::add_augmented_productions(string locSymbol) {
     for (auto it = variables.begin(); it != variables.end(); it++) {
         vector<vector<string>> productions = it->second->getProductions();
         for (int j = 0; j < productions.size(); j++) {
-            it->second->editProduction(j, 0, locSymbol, false, false);
+            it->second->editProduction(j,0,locSymbol, false, false);
         }
     }
 }
@@ -142,25 +141,25 @@ Variable *CFG::getStartSymbole() const {
     return startSymbole;
 }
 
-void CFG::getClosure(string variable, vector<Variable *> &closure) {
-    if (variables.find(variable) == variables.end()) return;
-    if (closure.empty()) closure.push_back(variables[variable]);
+void CFG::getClosure(string variable, vector<Variable*> &closure) {
+    if(variables.find(variable) == variables.end()) return;
+    if(closure.empty()) closure.push_back(variables[variable]);
 
     vector<vector<string>> prods = variables[variable]->getProductions();
-    for (auto it1 = prods.begin(); it1 != prods.end(); it1++) {
+    for(auto it1 = prods.begin(); it1 != prods.end(); it1++){
         vector<string> prod = *it1;
-        for (auto it2 = prod.begin(); it2 != prod.end(); it2++) {
-            if (variables.find(*it2) == variables.end()) continue;
+        for(auto it2 = prod.begin(); it2 != prod.end(); it2++){
+            if(variables.find(*it2) == variables.end()) continue;
             bool found = false;
-            for (int i = 0; i < closure.size(); i++) {
-                if (closure[i]->getName() == *it2) {
+            for(int i = 0; i < closure.size(); i++){
+                if(closure[i]->getName() == *it2){
                     found = true;
                     break;
                 }
             }
-            if (!found) {
+            if(!found){
                 closure.push_back(variables[*it2]);
-                getClosure(*it2, closure);
+                getClosure(*it2,closure);
             }
         }
     }

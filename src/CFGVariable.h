@@ -8,29 +8,23 @@
 #include <vector>
 #include <string>
 
+using namespace std;
 
 class Variable {
-
 public:
-    Variable(const std::vector<std::vector<std::string>> &productions, const std::string &name);
+    Variable(const vector<vector<string>> &productions, const string &name);
+    const string &getName() const;
 
-    const std::string &getName() const;
-
-    void deleteProduction(std::vector<std::string> prod);
-
-    void addProduction(std::vector<std::string> prod);
-
-    const std::vector<std::vector<std::string>> &getProductions() const;
-
+    void deleteProduction(vector<string> prod);
+    void addProduction(vector<string> prod);
+    const vector<vector<string>> &getProductions() const;
     int countProds();
-
-    void editProduction(int indexProds, int indexProd, std::string change, bool tilend = false, bool replace = true);
-
-    bool hasProduction(std::vector<std::string> a);
+    void editProduction(int indexProds, int indexProd, string change, bool tilend = false, bool replace = true);
+    bool hasProduction(vector<string> a);
 
 private:
-    std::vector<std::vector<std::string>> productions;
-    std::string name;
+    vector<vector<string>> productions;
+    string name;
 };
 
 
