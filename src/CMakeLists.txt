@@ -7,7 +7,8 @@ add_library(Compiler
         FileLoader.cpp FileLoader.h
         Lexer.cpp Lexer.h
         lib.h
-        Parser.cpp Parser.h)
+        Parser.cpp Parser.h
+        ParseTable.cpp ParseTable.h)
 
 add_subdirectory(AbstractSyntaxTree)
 add_subdirectory(json)
