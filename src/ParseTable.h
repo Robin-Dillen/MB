@@ -8,6 +8,7 @@
 #include "DFA.h"
 #include <map>
 #include <iostream>
+#include "Lexer.h"
 
 inline bool found(const std::string &s, const std::vector<std::string> &vec) {
     bool found = false;
@@ -26,13 +27,13 @@ class ParseTable {
     std::list<std::string> States;
     std::map<std::string, std::map<std::string, std::string>> table;
     std::string locSymbole = ".";
-    std::map<string, unsigned int> colWidths;
+    std::map<std::string, unsigned int> colWidths;
 public:
     explicit ParseTable(const DFA &dfa);
 
     std::map<std::string, std::map<std::string, std::string>> getTable() const;
-
-    void printTableToFile(std::ofstream &out);
+    void printTableToFile(std::ofstream& out);
+    void checkInputTokens(std::vector<Token>);
 };
 
 

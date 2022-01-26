@@ -7,7 +7,7 @@
 
 ParseTable::ParseTable(const DFA &dfa) {
     terminals = dfa.getTerminals();
-    variables = vector<std::string>();
+    variables = std::vector<std::string>();
     for (const auto &el: dfa.getVariables()) {
         variables.push_back(el.first);
     }
@@ -57,7 +57,7 @@ ParseTable::ParseTable(const DFA &dfa) {
                     colWidths["EOS"] = 8;
             } else {
                 std::string reduceRule;
-                std::vector<string> reduceProd = state->getContent().begin()->second.front();
+                std::vector<std::string> reduceProd = state->getContent().begin()->second.front();
                 reduceRule += state->getContent().begin()->first;
                 reduceRule += " -> ";
                 for (const std::string &el: reduceProd) {
@@ -121,4 +121,8 @@ void ParseTable::printTableToFile(std::ofstream &out) {
         out << std::endl;
         out << lineString << std::endl;
     }
+}
+
+void ParseTable::checkInputTokens(std::vector<Token>) {
+
 }

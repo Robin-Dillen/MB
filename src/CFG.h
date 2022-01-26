@@ -11,7 +11,7 @@
 #include <map>
 #include <iostream>
 #include "CFGVariable.h"
-#include "json.hpp"
+#include "json/json.hpp"
 #include <fstream>
 #include <algorithm>
 
