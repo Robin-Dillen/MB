@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include "DFAState.h"
+#include "CFGVariable.h"
 
 class DFA {
 private:

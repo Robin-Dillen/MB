@@ -7,60 +7,60 @@
 
 class Data {
 public:
-    virtual bool operator==(node_type type) const = 0;
+    virtual bool operator==(TokenType type) const = 0;
 
-    virtual node_type getType() const = 0;
+    virtual TokenType getType() const = 0;
 };
 
 class Root : public Data {
 public:
-    bool operator==(node_type type) const override;
+    bool operator==(TokenType type) const override;
 
-    node_type getType() const override;
+    TokenType getType() const override;
 };
 
 class While : public Data {
 public:
-    bool operator==(node_type type) const override;
+    bool operator==(TokenType type) const override;
 
-    node_type getType() const override;
+    TokenType getType() const override;
 };
 
 class Incr : public Data {
 public:
-    bool operator==(node_type type) const override;
+    bool operator==(TokenType type) const override;
 
-    node_type getType() const override;
+    TokenType getType() const override;
 };
 
 class Decr : public Data {
 public:
-    bool operator==(node_type type) const override;
+    bool operator==(TokenType type) const override;
 
-    node_type getType() const override;
+    TokenType getType() const override;
 };
 
 class Store : public Data {
 public:
-    bool operator==(node_type type) const override;
+    bool operator==(TokenType type) const override;
 
-    node_type getType() const override;
+    TokenType getType() const override;
 };
 
 class Print : public Data {
 public:
-    bool operator==(node_type type) const override;
+    bool operator==(TokenType type) const override;
 
-    node_type getType() const override;
+    TokenType getType() const override;
 };
 
 class Func : public Data {
 public:
     explicit Func(bool inline_);
 
-    bool operator==(node_type type) const override;
+    bool operator==(TokenType type) const override;
 
-    node_type getType() const override;
+    TokenType getType() const override;
 
     bool get() const;
 
@@ -72,9 +72,9 @@ class Identifier : public Data {
 public:
     explicit Identifier(std::string name);
 
-    bool operator==(node_type type) const override;
+    bool operator==(TokenType type) const override;
 
-    node_type getType() const override;
+    TokenType getType() const override;
 
     std::string get() const;
 
@@ -87,9 +87,9 @@ class Const : public Data {
 public:
     explicit Const(unsigned int value);
 
-    bool operator==(node_type type) const override;
+    bool operator==(TokenType type) const override;
 
-    node_type getType() const override;
+    TokenType getType() const override;
 
     unsigned int get() const;
 
@@ -99,9 +99,9 @@ private:
 
 class End : public Data {
 public:
-    bool operator==(node_type type) const override;
+    bool operator==(TokenType type) const override;
 
-    node_type getType() const override;
+    TokenType getType() const override;
 };
 
 

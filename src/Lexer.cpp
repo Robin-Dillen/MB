@@ -1,6 +1,5 @@
 
 #include "Lexer.h"
-#include "lib.h"
 
 #include <iostream>
 #include <algorithm>

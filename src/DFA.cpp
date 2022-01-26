@@ -1,5 +1,4 @@
 #include "DFA.h"
-#include "CFGVariable.h"
 
 #include <utility>
 #include <list>

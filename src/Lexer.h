@@ -1,9 +1,10 @@
 #ifndef MB_LEXER_H
 #define MB_LEXER_H
 
+#include "lib.h"
+
 #include <vector>
 #include <string>
-
 
 class Lexer {
 public:

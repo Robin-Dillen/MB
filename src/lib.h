@@ -1,4 +1,5 @@
 #include <utility>
+#include <string>
 
 #ifndef MB_LIB_H
 #define MB_LIB_H
@@ -131,7 +132,7 @@ enum cmp_op {
 
 enum TokenType {
     while_, incr_, decr_, print_, import_, identifier_, number_, operator_, lparen_, rparen_, lbrace_,
-    rbrace_, semicolon_, colon_, comma_, inplace_, filename_, const_, newline_
+    rbrace_, semicolon_, colon_, comma_, inplace_, filename_, const_, newline_, /*vanaf hier is voor compiler*/root_, func_, end_
 };
 
 struct Token {

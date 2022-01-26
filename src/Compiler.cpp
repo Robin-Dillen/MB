@@ -9,8 +9,6 @@
 #include <sys/stat.h>
 #include <iostream>
 
-typedef Token Data;
-
 static const unsigned char EOL[4] = "EOL";
 
 class CompilationError : public std::runtime_error {
@@ -390,7 +388,7 @@ void compileNode(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &node,
             // possible error
             break;
 
-        case store_:
+        case operator_:
             constructStore(node, program);
             break;
 
