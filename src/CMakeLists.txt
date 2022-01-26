@@ -14,4 +14,4 @@ add_library(Compiler
 add_subdirectory(AbstractSyntaxTree)
 add_subdirectory(json)
 
-target_link_libraries(Compiler AST DFA JSON)
+target_link_libraries(Compiler AST JSON)
