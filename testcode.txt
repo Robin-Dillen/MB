@@ -1,5 +1,4 @@
-while Aux != 0 {
-    incr Today;
-    incr Tomorrow;
-    decr Aux;
+import clear;
+while Today != 0 {
+    incr Aux;
 }

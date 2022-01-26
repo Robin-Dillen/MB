@@ -11,11 +11,8 @@ int main(int argc, char **argv) {
     FileLoader fl("../testcode.txt");
     Lexer lexer(fl.getFilecontents());
     const std::vector<Token> &tokens = lexer.getTokens();
-    //for(Token t : tokens){
-    //    std::cout<<t.value<<std::endl;
-    //}
 
-    CFG *cfg = new CFG("../CFGs/CFG_2_0.json");
+    CFG *cfg = new CFG("../CFGs/CFG_2_1.json");
 
     Parser p(cfg);
     ParseTable table = std::move(p.getParseTable());

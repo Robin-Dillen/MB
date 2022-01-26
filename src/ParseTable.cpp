@@ -181,6 +181,10 @@ void ParseTable::checkInputTokens(const std::vector<Token> &input) {
             }
         }else {
             Token token = remainingInput[0];
+            if(token.type == newline_) {
+                remainingInput.erase(remainingInput.begin());
+                continue;
+            }
             if(table[contents[contents.size()-1]][getTypeString(token.type)].empty()){
                 //error TODO
             }else{
@@ -188,10 +192,6 @@ void ParseTable::checkInputTokens(const std::vector<Token> &input) {
                                  getTypeString(token.type));
             }
         }
-        for(std::string st : contents){
-            std::cout<<st<<'\t';
-        }
-        std::cout<<std::endl;
     }
 }
 
@@ -207,10 +207,12 @@ void ParseTable::computeOperation(std::vector<std::string> &contents, std::vecto
     //Productions
     else if(operation.find("->") != operation.npos){
         std::string replaceItems = operation.substr(operation.find("->")+3);
-        std::string newVar(1,operation[0]);
+        std::string newVar = operation.substr(0,operation.find("->")-1);
+
         std::vector<std::string> go_to;
         int pos = 0;
-        while(pos = replaceItems.find(" ") != std::string::npos){
+        while(replaceItems.find(" ") != std::string::npos){
+            pos = replaceItems.find(" ");
             go_to.push_back(replaceItems.substr(0,pos));
             replaceItems.erase(0,pos+1);
         }
