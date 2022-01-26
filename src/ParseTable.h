@@ -28,12 +28,15 @@ class ParseTable {
     std::map<std::string, std::map<std::string, std::string>> table;
     std::string locSymbole = ".";
     std::map<std::string, unsigned int> colWidths;
-    void computeOperation(std::vector<std::string> &contents, std::vector<Token> &remainingInput, std::string operation, std::string token = "EOS");
+
+    void computeOperation(std::vector<std::string> &contents, std::vector<Token> &remainingInput, const std::string &operation, const std::string token = "EOS");
 public:
     explicit ParseTable(const DFA &dfa);
 
     std::map<std::string, std::map<std::string, std::string>> getTable() const;
+
     void printTableToFile(std::ofstream& out);
+
     void checkInputTokens(const std::vector<Token>& input);
 };
 

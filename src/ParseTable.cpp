@@ -170,23 +170,25 @@ std::string getTypeString(enum TokenType type){
 }
 
 void ParseTable::checkInputTokens(const std::vector<Token> &input) {
+    //TODO Create Abstract syntax tree
     std::vector<std::string> contents = {table.begin()->first};
     std::vector<Token> remainingInput = input;
     while(contents[contents.size()-1] != "accept"){
         if(remainingInput.empty()){
             if(table[contents[contents.size()-1]]["EOS"].empty()){
-                //error TODO
+                //TODO error detection
             }else {
                 computeOperation(contents,remainingInput, table[contents[contents.size()-1]]["EOS"]);
             }
         }else {
             Token token = remainingInput[0];
+            //TODO add to abstract syntax tree
             if(token.type == newline_) {
                 remainingInput.erase(remainingInput.begin());
                 continue;
             }
             if(table[contents[contents.size()-1]][getTypeString(token.type)].empty()){
-                //error TODO
+                //TODO error detection
             }else{
                 computeOperation(contents, remainingInput, table[contents[contents.size()-1]][getTypeString(token.type)],
                                  getTypeString(token.type));
@@ -195,7 +197,7 @@ void ParseTable::checkInputTokens(const std::vector<Token> &input) {
     }
 }
 
-void ParseTable::computeOperation(std::vector<std::string> &contents, std::vector<Token> &remainingInput, std::string operation, std::string token) {
+void ParseTable::computeOperation(std::vector<std::string> &contents, std::vector<Token> &remainingInput, const std::string &operation, const std::string token) {
     //Shifts
     if(operation.find("shift") != operation.npos){
         contents.push_back(token);
@@ -220,7 +222,7 @@ void ParseTable::computeOperation(std::vector<std::string> &contents, std::vecto
             if(contents[contents.size()-2-(2*i)] == go_to[i]){
                 continue;
             }else {
-                //error TODO
+                //TODO error detection
             }
         }
         contents.erase(contents.end()-(2*(go_to.size())), contents.end());
