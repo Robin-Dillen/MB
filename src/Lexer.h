@@ -23,6 +23,8 @@ private:
     std::string getTokenName(const Token &token) const;
 
     std::vector<Token> Tokens;
+
+    void swapLastEl(std::vector<Token> &vector1);
 };
 
 
