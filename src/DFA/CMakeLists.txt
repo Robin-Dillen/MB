@@ -1,0 +1,1 @@
+add_library(DFA DFA.cpp DFA.h DFAState.cpp DFAState.h)

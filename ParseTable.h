@@ -9,10 +9,10 @@
 #include <map>
 #include <iostream>
 
-inline bool found(const std::string& s, const std::vector<std::string>& vec){
+inline bool found(const std::string &s, const std::vector<std::string> &vec) {
     bool found = false;
-    for (const std::string& el : vec) {
-        if (el == s){
+    for (const std::string &el: vec) {
+        if (el == s) {
             found = true;
             break;
         }
@@ -28,9 +28,11 @@ class ParseTable {
     std::string locSymbole = ".";
     std::map<string, unsigned int> colWidths;
 public:
-    explicit ParseTable(const DFA& dfa);
+    explicit ParseTable(const DFA &dfa);
+
     std::map<std::string, std::map<std::string, std::string>> getTable() const;
-    void printTableToFile(std::ofstream& out);
+
+    void printTableToFile(std::ofstream &out);
 };
 
 

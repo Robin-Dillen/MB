@@ -65,7 +65,7 @@ node_type Print::getType() const {
 
 // ------------------------------------- Func -------------------------------------
 
-Func::Func(bool inline_) : inline_(inline_){}
+Func::Func(bool inline_) : inline_(inline_) {}
 
 bool Func::operator==(node_type type) const {
     return func_ == type;
@@ -91,7 +91,7 @@ node_type Identifier::getType() const {
     return identifier_;
 }
 
-std::string Identifier::get() const{
+std::string Identifier::get() const {
     return name;
 }
 

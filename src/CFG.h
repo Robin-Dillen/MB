@@ -1,7 +1,3 @@
-//
-// Created by niels on 12/10/2021.
-//
-
 #ifndef PROGRAMMEEROPDRACHT_CFG_H
 #define PROGRAMMEEROPDRACHT_CFG_H
 
@@ -11,29 +7,30 @@
 #include <map>
 #include <iostream>
 #include "CFGVariable.h"
-#include "json.hpp"
+#include "json/json.hpp"
 #include <fstream>
 #include <algorithm>
-
-
-using namespace std;
 
 class CFG {
 public:
     CFG(string json);
+
     void print();
+
     void add_augmented_productions(string locSymbol);
 
     Variable *getStartSymbole() const;
-    vector<string> getTerminals(){ return terminals;}
-    map<string, Variable*> getVariables(){ return variables;}
 
-    void getClosure(string variable, vector<Variable*> &closure);
+    vector <string> getTerminals() { return terminals; }
+
+    map<string, Variable *> getVariables() { return variables; }
+
+    void getClosure(string variable, vector<Variable *> &closure);
 
 private:
-    vector<string> terminals;
-    map<string,Variable*> variables;
-    Variable* startSymbole;
+    vector <string> terminals;
+    map<string, Variable *> variables;
+    Variable *startSymbole;
 };
 
 

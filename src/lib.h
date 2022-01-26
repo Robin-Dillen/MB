@@ -1,9 +1,7 @@
+#include <utility>
+
 #ifndef MB_LIB_H
 #define MB_LIB_H
-
-enum node_type {
-    while_, incr_, decr_, identifier_, store_, print_, func_, const_, root_, end_
-};
 
 enum opcodes {
     POP_TOP = 1,
@@ -127,6 +125,36 @@ enum opcodes {
     DICT_UPDATE = 165
 };
 
-enum cmp_op {LT, LTE, EQ, NEQ, GT, GTE};
+enum cmp_op {
+    LT, LTE, EQ, NEQ, GT, GTE
+};
+
+enum TokenType {
+    while_,
+    incr_,
+    decr_,
+    print_,
+    import_,
+    identifier_,
+    number_,
+    operator_,
+    lparen_,
+    rparen_,
+    lbrace_,
+    rbrace_,
+    semicolon_,
+    colon_,
+    comma_,
+    inplace_,
+    filename_,
+    const_
+};
+
+struct Token {
+    Token(TokenType type, std::string value) : type(type), value(std::move(value)) {};
+
+    TokenType type;
+    std::string value;
+};
 
 #endif //MB_LIB_H

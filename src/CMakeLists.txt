@@ -1,4 +1,14 @@
-add_library(Compiler Compiler.cpp Compiler.h lib.h Data.cpp Data.h)
+add_library(Compiler
+        CFG.cpp CFG.h
+        CFGVariable.cpp CFGVariable.h
+        Compiler.cpp Compiler.h
+        FileLoader.cpp FileLoader.h
+        Lexer.cpp Lexer.h
+        lib.h
+        Parser.cpp Parser.h)
 
 add_subdirectory(AbstractSyntaxTree)
-target_link_libraries(Compiler AST)
+add_subdirectory(DFA)
+add_subdirectory(json)
+
+target_link_libraries(Compiler AST DFA JSON)

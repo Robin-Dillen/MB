@@ -1,56 +1,21 @@
 #include "src/Compiler.h"
 #include "src/Data.h"
-#include <iostream>
+#include "FileLoader.h"
+#include "Lexer.h"
 #include "Parser.h"
-#include "CFG.h"
+#include <iostream>
 
-int main(){
-    CFG* cfg = new CFG("idk");
+int main(int argc, char **argv) {
+
+    std::cout << argv[0] << endl;
+    FileLoader fl(argv[0]);
+    Lexer lexer(fl.getFilecontents());
+    const std::vector<Token> &tokens = lexer.getTokens();
+
+    CFG *cfg = new CFG("../CFGs/CFG_2_0.json");
     Parser p(cfg);
-    ParseTable table = p.getParseTable();
+    ParseTable table = std::move(p.getParseTable());
+//    compile();
 
-    ofstream file;
-    file.open("ParseTableOutput.txt");
-    if (file) {
-        table.printTableToFile(file);
-    }
-    file.close();
-
-
-//    Py_SetPythonHome(L"C:/Users/nibor/AppData/Local/Programs/Python/Python39");
-/*
-    Py_Initialize();
-    Identifier* variable = new Identifier("x");
-    AST::AbstractSyntaxTree<Data*> ast_root(new Root, 0);
-    AST::AbstractSyntaxTree<Data*> ast_store(new Store, 0);
-    AST::AbstractSyntaxTree<Data*> ast_var1(variable, 0);
-    AST::AbstractSyntaxTree<Data*> ast_var2(variable, 0);
-    AST::AbstractSyntaxTree<Data*> ast_var3(variable, 0);
-    AST::AbstractSyntaxTree<Data*> ast_var4(variable, 0);
-    AST::AbstractSyntaxTree<Data*> ast_const(new Const(5), 0);
-    AST::AbstractSyntaxTree<Data*> ast_while(new While, 0);
-    AST::AbstractSyntaxTree<Data*> ast_endwhile(new End, 0);
-    AST::AbstractSyntaxTree<Data*> ast_print(new Print, 0);
-    AST::AbstractSyntaxTree<Data*> ast_decr(new Decr, 0);
-
-    ast_root.appendChild(&ast_store);
-    ast_root.appendChild(&ast_while);
-
-    ast_store.appendChild(&ast_var1);
-    ast_store.appendChild(&ast_const);
-
-    ast_while.appendChild(&ast_var2);
-    ast_while.appendChild(&ast_print);
-    ast_while.appendChild(&ast_decr);
-    ast_while.appendChild(&ast_endwhile);
-
-    ast_print.appendChild(&ast_var3);
-
-    ast_decr.appendChild(&ast_var4);
-
-    compile(ast_root);
-
-    Py_Finalize();
-*/
     return 0;
 }

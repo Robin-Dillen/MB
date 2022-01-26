@@ -1,16 +1,12 @@
 #define PY_SSIZE_T_CLEAN
-#include <Python.h>
-#include <marshal.h>
-#include <tuple>
-#include <iostream>
 
 #include "AbstractSyntaxTree/AbstractSyntaxTree.h"
-#include "Data.h"
+#include "lib.h"
 
 #ifndef AST_COMPILER_H
 #define AST_COMPILER_H
 
-void compile(const AST::AbstractSyntaxTree<Data*>& ast);
+void compile(const AST::AbstractSyntaxTree<Token *> &ast);
 
 
 #endif //AST_COMPILER_H

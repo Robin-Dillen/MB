@@ -13,23 +13,25 @@
 
 namespace AST {
 
-class Error: public std::exception {
-public:
-    enum type {};
+    class Error : public std::exception {
+    public:
+        enum type {
+        };
 
-    explicit Error(std::string error_msg, type error_type): msg(std::move(error_msg)), error_type(error_type){};
-    Error(const Error& other) noexcept: msg(other.msg), error_type(other.error_type){};
+        explicit Error(std::string error_msg, type error_type) : msg(std::move(error_msg)), error_type(error_type) {};
 
-    ~Error() noexcept override = default;
+        Error(const Error &other) noexcept: msg(other.msg), error_type(other.error_type) {};
 
-    const char *what() const noexcept override {
-        return msg.c_str();
-    }
+        ~Error() noexcept override = default;
 
-private:
-    std::string msg;
-    Error::type error_type;
-};
+        const char *what() const noexcept override {
+            return msg.c_str();
+        }
+
+    private:
+        std::string msg;
+        Error::type error_type;
+    };
 
     template<class AData>
     class AbstractSyntaxTree {
@@ -40,7 +42,9 @@ private:
         unsigned int line_no;
         std::unique_ptr<Error> error = nullptr;
 
-        AbstractSyntaxTree(AbstractSyntaxTree<AData> *parent, AData data, unsigned int line_no) : parent(parent), data(data), line_no(line_no) {
+        AbstractSyntaxTree(AbstractSyntaxTree<AData> *parent, AData data, unsigned int line_no) : parent(parent),
+                                                                                                  data(data),
+                                                                                                  line_no(line_no) {
         }
 
         void setParent(AbstractSyntaxTree<AData> *parent) {
@@ -50,7 +54,8 @@ private:
     public:
         explicit AbstractSyntaxTree(AData data, unsigned int line_no) : AbstractSyntaxTree(nullptr, data, line_no) {};
 
-        explicit AbstractSyntaxTree(AData data, unsigned int line_no, const std::string& error_msg, const Error::type& error_type) : AbstractSyntaxTree(nullptr, data, line_no) {
+        explicit AbstractSyntaxTree(AData data, unsigned int line_no, const std::string &error_msg,
+                                    const Error::type &error_type) : AbstractSyntaxTree(nullptr, data, line_no) {
             error = std::make_unique<Error>(error_msg, error_type);
         };
 
@@ -60,7 +65,7 @@ private:
 
         void appendChild(AbstractSyntaxTree<AData> *child) {
             child->setParent(this);
-            if (child->error){
+            if (child->error) {
                 throw Error(*child->error);
             }
             children.push_back(child);
