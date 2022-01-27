@@ -125,7 +125,7 @@ void Lexer::tokenize(const std::string &str) {
                 punctStr = "";
                 punctfound = true;
             } else if (punctStr == "}") {
-                Tokens.push_back(Token(epsilon_, "#"));
+                Tokens.push_back(Token(epsilon2_, "#"));
                 Tokens.push_back(Token(rbrace_, punctStr));
                 punctStr = "";
                 punctfound = true;
@@ -249,13 +249,13 @@ void Lexer::addEpsilon(){
             index += 1;
             }
         auto itPos = Tokens.begin() + index;
-        Tokens.insert(itPos, Token(epsilon_, "#"));
+        Tokens.insert(itPos, Token(epsilon1_, "#"));
     }
     else{
-        Tokens.insert(Tokens.begin(), Token(epsilon_, "#"));
+        Tokens.insert(Tokens.begin(), Token(epsilon1_, "#"));
     }
 
-    Tokens.push_back(Token(epsilon_, "#"));
+    Tokens.push_back(Token(epsilon2_, "#"));
 }
 
 const std::vector<Token> &Lexer::getTokens() {
@@ -303,6 +303,10 @@ std::string Lexer::getTokenName(const Token &token) const {
             return "import";
         case newline_:
             return "newline";
+        case epsilon1_:
+            return "epsilon1";
+        case epsilon2_:
+            return "epsilon2";
         default:
             return "unknownType";
     }
