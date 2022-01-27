@@ -2,9 +2,11 @@
 // Created by Khemin on 11-12-2021.
 //
 #include "ParseTable.h"
+#include "AbstractSyntaxTree/AbstractSyntaxTree.h"
 #include "lib.h"
 
 #include <fstream>
+#include <algorithm>
 #include <stack>
 
 
