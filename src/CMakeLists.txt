@@ -2,7 +2,6 @@ add_library(Compiler
         CFG.cpp CFG.h
         CFGVariable.cpp CFGVariable.h
         Compiler.cpp Compiler.h
-        Data.cpp Data.h
         DFA.cpp DFA.h
         DFAState.cpp DFAState.h
         FileLoader.cpp FileLoader.h

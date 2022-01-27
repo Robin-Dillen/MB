@@ -7,7 +7,15 @@
 #ifndef AST_COMPILER_H
 #define AST_COMPILER_H
 
-void compile(const AST::AbstractSyntaxTree<Token*> &ast);
+class CompilationError : public std::runtime_error {
+public:
+    explicit CompilationError(const std::string &arg) : runtime_error(arg) {
+    }
+
+    ~CompilationError() noexcept override = default;
+};
+
+void compile(const AST::AbstractSyntaxTree<Token*> &ast, const std::string& filename);
 
 
 #endif //AST_COMPILER_H

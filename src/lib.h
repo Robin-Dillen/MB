@@ -126,13 +126,13 @@ enum opcodes: unsigned char {
     DICT_UPDATE = 165
 };
 
-enum cmp_op {
+enum cmp_op : unsigned char{
     LT, LTE, EQ, NEQ, GT, GTE
 };
 
 enum TokenType {
     while_, incr_, decr_, print_, import_, identifier_, number_, operator_, lparen_, rparen_, lbrace_, epsilon1_, epsilon2_,
-    rbrace_, semicolon_, colon_, comma_, inplace_, filename_, const_, newline_, /*vanaf hier is voor compiler*/root_, func_, end_
+    rbrace_, semicolon_, colon_, comma_, inplace_, filename_, const_, newline_, /*vanaf hier is voor compiler*/root_, func_, endwhile_, endfunc_
 };
 
 struct Token {
@@ -141,6 +141,55 @@ struct Token {
     TokenType type;
     std::string value;
 };
+
+inline std::string getTypeString(enum TokenType type){
+    switch(type) {
+        case while_ :
+            return "while";
+        case incr_ :
+            return "incr";
+        case decr_ :
+            return "decr";
+        case print_ :
+            return "print";
+        case import_ :
+            return "import";
+        case identifier_ :
+            return "identifier";
+        case number_ :
+            return "number";
+        case operator_ :
+            return "operator";
+        case lparen_ :
+            return "lparen";
+        case rparen_ :
+            return "rparen";
+        case lbrace_ :
+            return "lbrace";
+        case rbrace_ :
+            return "rbrace";
+        case semicolon_ :
+            return "semicolon";
+        case colon_ :
+            return "colon";
+        case comma_ :
+            return "comma";
+        case inplace_ :
+            return "inplace";
+        case filename_ :
+            return "filename";
+        case const_ :
+            return "const";
+        case newline_ :
+            return "newline";
+        case epsilon1_:
+            return "epsilon1_";
+        case epsilon2_:
+            return "epsilon2_";
+        default:
+            return "junk";
+    }
+}
 
 
 #endif //MB_LIB_H

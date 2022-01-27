@@ -1,5 +1,4 @@
 #include "src/Compiler.h"
-//#include "src/Data.h"
 #include "src/FileLoader.h"
 #include "src/Lexer.h"
 #include "src/Parser.h"
@@ -8,29 +7,36 @@
 
 int main(int argc, char **argv) {
 
-    FileLoader fl("../testcode.txt");
-    Lexer lexer(fl.getFilecontents());
-    const std::vector<Token> &tokens = lexer.getTokens();
-
-    for(auto i : tokens){
-        std::cout<<i.value<< std::endl;
-    }
+    for (int i = 1; i < argc; i++) {
+        std::string filename = argv[i];
+        std::cout << filename << std::endl;
+        FileLoader fl(filename);
+        Lexer lexer(fl.getFilecontents());
+        const std::vector<Token> &tokens = lexer.getTokens();
 
     CFG *cfg = new CFG("../CFGs/CFG_2_0.json");
-    cfg->print();
+//    cfg->print();
 
-    Parser p(cfg);
-    ParseTable table = std::move(p.getParseTable());
+        Parser p(cfg);
+        ParseTable table = std::move(p.getParseTable());
 
 
-    std::ofstream file;
-    file.open("../ParseTableOutput.txt");
-    if (file) {
-        table.printTableToFile(file);
+        std::ofstream file;
+        file.open("../ParseTableOutput.txt");
+        if (file) {
+            table.printTableToFile(file);
+        }
+        file.close();
+        std::string output_file = filename.substr(0, filename.size() - 4);
+        try {
+            auto tree = table.checkInputTokens(tokens);
+            if (tree)
+                compile(*table.checkInputTokens(tokens), output_file);
+        } catch (CompilationError& e){
+            std::cerr << "The compilation was aborted!" << std::endl << e.what() << std::endl;
+        }
+        std::cout << "-----------------------------------" << std::endl;
     }
-    file.close();
-
-    table.checkInputTokens(tokens);
 
 
 

@@ -11,14 +11,6 @@
 
 static const unsigned char EOL[4] = "EOL";
 
-class CompilationError : public std::runtime_error {
-public:
-    explicit CompilationError(const std::string &arg) : runtime_error(arg) {
-    }
-
-    ~CompilationError() noexcept override = default;
-};
-
 inline bool file_exists(const std::string &name) {
     struct stat buffer;
     return (stat(name.c_str(), &buffer) == 0);
@@ -157,19 +149,34 @@ void compileNode(typename AST::AbstractSyntaxTree<Token *>::Const_Iterator &node
 
 
 void constructWhile(typename AST::AbstractSyntaxTree<Token *>::Const_Iterator &node, Program &program) {
-    ++node; // first argument (identifier)
+    ++node; // first argument (operator)
+    cmp_op oper;
+    if (node->getData()->value == "==") oper = EQ;
+    else if (node->getData()->value == "!=") oper = NEQ;
+    else if (node->getData()->value == "<") oper = LT;
+    else if (node->getData()->value == "<=") oper = LTE;
+    else if (node->getData()->value == ">") oper = GT;
+    else if (node->getData()->value == ">=") oper = GTE;
+    ++node; // first argument(identifier)
     std::string name = node->getData()->value;
     PyObject *py_name = PyUnicode_FromStringAndSize(name.c_str(), name.size());
     int name_index = program.findValueOrAdd(py_name);
 
-    int const_index = program.findConstOrAdd(PyLong_FromLong(0));
+    ++node; // second argument(const)
+    int const_index;
+    try {
+        const_index = program.findConstOrAdd(PyLong_FromLong(std::stoi(node->getData()->value)));
+    } catch (std::invalid_argument& e){
+        throw CompilationError("Can't compare with a non constant! Error at line: " + std::to_string(node->getLineNo()));
+    }
+
     int begin = program.getLineNo() + 2;
 
     program << LOAD_NAME << (unsigned char) name_index << EOL;
     program << LOAD_CONST << (unsigned char) const_index << EOL;
-    program << COMPARE_OP << (unsigned char) NEQ << EOL;
+    program << COMPARE_OP << oper << EOL;
     ++node; // body
-    if (node->getData()->type == end_) {
+    if (node->getData()->type == endwhile_) {
         std::stringstream error_msg;
         error_msg << "Error on line: " << "[WIP]" << " ,can't have a while loop with an empty body!" << std::endl;
         throw CompilationError(error_msg.str());
@@ -179,14 +186,13 @@ void constructWhile(typename AST::AbstractSyntaxTree<Token *>::Const_Iterator &n
     do {
         compileNode(node_cpy, temp);
         ++node_cpy;
-    } while (node_cpy->getData()->type != end_);
-    std::cout << temp.getLineNo() << std::endl;
+    } while (node_cpy->getData()->type != endwhile_);
     program << POP_JUMP_IF_FALSE << (unsigned char) (program.getLineNo() + temp.getLineNo() + 6)
             << EOL; // +2 for current op and +2 for jump absolute
     do {
         compileNode(node, program);
         ++node;
-    } while (node->getData()->type != end_);
+    } while (node->getData()->type != endwhile_);
     program << JUMP_ABSOLUTE << (unsigned char) begin << EOL;
 }
 
@@ -277,7 +283,7 @@ void constructFunc(typename AST::AbstractSyntaxTree<Token *>::Const_Iterator &no
         }
         args.emplace_back(node->getData()->value);
         ++node;
-    } while (node->getData()->type != end_);
+    } while (node->getData()->type != endfunc_);
     { // put the arguments in sys.argv
         for (const std::string &arg: args) {
             int name_i = program.findValue(PyUnicode_FromStringAndSize(arg.c_str(), arg.size()));
@@ -452,7 +458,7 @@ void compileNode(typename AST::AbstractSyntaxTree<Token *>::Const_Iterator &node
 }
 
 
-void compile(const AST::AbstractSyntaxTree<Token *> &ast) {
+void compile(const AST::AbstractSyntaxTree<Token *> &ast, const std::string& filename) {
     Py_SetPythonHome(L"C:/Users/nibor/AppData/Local/Programs/Python/Python39");
     Py_Initialize();
     Program program;
@@ -464,11 +470,9 @@ void compile(const AST::AbstractSyntaxTree<Token *> &ast) {
     Py_ssize_t length;
     PyCodeObject *codeObject = program.getCodeObject();
     PyBytes_AsStringAndSize(codeObject->co_code, &marshalled, &length);
-    for (int i = 0; i < length; i++)
-        std::cout << (int)(unsigned char) marshalled[i] << " ";
     PyObject *source = PyMarshal_WriteObjectToString((PyObject *) (codeObject), Py_MARSHAL_VERSION);
     PyBytes_AsStringAndSize(source, &marshalled, &length);
-    std::ofstream file("../test2.pyc", std::ios::binary | std::ios::trunc);
+    std::ofstream file("../" + filename + ".pyc", std::ios::binary | std::ios::trunc);
     {
         constexpr short int magic_int = (PY_MINOR_VERSION == 9 ? 3425 : 3400); // magic int for python 3.8 or 3.9
         char byte1, byte2, byte3 = '\r', byte4 = '\n';

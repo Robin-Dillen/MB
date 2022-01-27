@@ -2,11 +2,9 @@
 // Created by Khemin on 11-12-2021.
 //
 #include "ParseTable.h"
-#include "AbstractSyntaxTree/AbstractSyntaxTree.h"
-#include "Data.h"
+#include "lib.h"
 
 #include <fstream>
-#include <algorithm>
 #include <stack>
 
 
@@ -128,62 +126,12 @@ void ParseTable::printTableToFile(std::ofstream &out) {
     }
 }
 
-std::string getTypeString(enum TokenType type){
-    switch(type) {
-        case while_ :
-            return "while";
-        case incr_ :
-            return "incr";
-        case decr_ :
-            return "decr";
-        case print_ :
-            return "print";
-        case import_ :
-            return "import";
-        case identifier_ :
-            return "identifier";
-        case number_ :
-            return "number";
-        case operator_ :
-            return "operator";
-        case lparen_ :
-            return "lparen";
-        case rparen_ :
-            return "rparen";
-        case lbrace_ :
-            return "lbrace";
-        case rbrace_ :
-            return "rbrace";
-        case semicolon_ :
-            return "semicolon";
-        case colon_ :
-            return "colon";
-        case comma_ :
-            return "comma";
-        case inplace_ :
-            return "inplace";
-        case filename_ :
-            return "filename";
-        case const_ :
-            return "const";
-        case newline_ :
-            return "newline";
-        case epsilon1_:
-            return "epsilon1_";
-        case epsilon2_:
-            return "epsilon2_";
-        default:
-            return "junk";
-    }
-}
-
-void ParseTable::checkInputTokens(const std::vector<Token> &input) {
+AST::AbstractSyntaxTree<Token*>* ParseTable::checkInputTokens(const std::vector<Token> &input) {
     auto root = new AST::AbstractSyntaxTree<Token*>(new Token(root_, ""), 0);
     std::stack<AST::AbstractSyntaxTree<Token*>*> current;
     current.push(root);
-    int line_no = 0;
+    int line_no = 1;
     Token cache(root_, "");
-    //TODO Create Abstract syntax tree
     std::vector<std::string> contents{table.begin()->first};
     std::vector<Token> remainingInput = input;
     while(contents.back() != "accept"){
@@ -191,12 +139,12 @@ void ParseTable::checkInputTokens(const std::vector<Token> &input) {
             if(table[contents.back()]["EOS"].empty()){
                 std::cout<<"error1"<<std::endl;
                 //TODO error detection
-                return;
+                return nullptr;
             }else {
                 if(!computeOperation(contents,remainingInput, table[contents.back()]["EOS"])){
                     std::cout<<"error3"<<std::endl;
                     //TODO error detection
-                    return;
+                    return nullptr;
                 }
             }
         }else {
@@ -207,9 +155,16 @@ void ParseTable::checkInputTokens(const std::vector<Token> &input) {
                     remainingInput.erase(remainingInput.begin());
                     continue;
 
+                case lparen_:
+                    goto exit_check;
+
+                case lbrace_:
                 case rparen_:
+                    current.pop();
+                    goto exit_check;
+
                 case rbrace_:
-                    //current.top()->appendChild(new AST::AbstractSyntaxTree<Token *>(new Token(end_, ""), line_no));
+                    current.top()->appendChild(new AST::AbstractSyntaxTree<Token *>(new Token(endwhile_, "end"), line_no));
                     current.pop();
                     goto exit_check;
                 case semicolon_:
@@ -218,6 +173,7 @@ void ParseTable::checkInputTokens(const std::vector<Token> &input) {
                     goto exit_check;
 
                 case identifier_:
+                    if (remainingInput[1].type != operator_) break;
                     cache = token;
                     goto exit_check;
 
@@ -242,7 +198,6 @@ void ParseTable::checkInputTokens(const std::vector<Token> &input) {
                         break;
 
                     case operator_:
-                        if (token.value != "=") break;
                         current.push(new_node);
                         current.top()->appendChild(new AST::AbstractSyntaxTree<Token *>(new Token(cache), line_no));
                         break;
@@ -254,24 +209,23 @@ void ParseTable::checkInputTokens(const std::vector<Token> &input) {
                 remainingInput.erase(remainingInput.begin());
                 continue;
             }
-            if(table[contents.back()][getTypeString(token.type)].empty()){
-                std::cout<<"error2"<<std::endl;
-                //TODO error detection
-                return;
-            }else{
-                if(!computeOperation(contents, remainingInput, table[contents.back()][getTypeString(token.type)],
-                                 getTypeString(token.type))){
-                    std::cout<<"error3"<<std::endl;
-                    //TODO error detection
-                    return;
+            int old_size = remainingInput.size();
+            while (remainingInput.size() == old_size) {
+                if (table[contents.back()][getTypeString(token.type)].empty()) {
+                    std::cout << "Missing token on line:" << line_no - 1 << " Got: " << getTypeString(token.type) << std::endl;
+                    return nullptr;
+                } else {
+                    if (!computeOperation(contents, remainingInput, table[contents.back()][getTypeString(token.type)],
+                                          getTypeString(token.type))) {
+                        std::cout << "error4" << std::endl;
+                        //TODO error detection
+                        return nullptr;
+                    }
                 }
             }
         }
-        for(auto i:contents){
-            std::cout<<i;
-        }
-        std::cout<<std::endl;
     }
+    return root;
 }
 
 bool ParseTable::computeOperation(std::vector<std::string> &contents, std::vector<Token> &remainingInput, const std::string &operation, const std::string token) {

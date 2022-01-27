@@ -87,6 +87,10 @@ namespace AST {
             return children.end();
         };
 
+        unsigned int getLineNo() const {
+            return line_no;
+        }
+
         struct Const_Iterator {
             using iterator_category = std::input_iterator_tag;
             using difference_type = std::ptrdiff_t;

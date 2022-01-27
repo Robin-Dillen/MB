@@ -6,9 +6,12 @@
 #define AST_PARSETABLE_H
 
 #include "DFA.h"
+#include "Lexer.h"
+#include "AbstractSyntaxTree/AbstractSyntaxTree.h"
+
 #include <map>
 #include <iostream>
-#include "Lexer.h"
+
 
 inline bool found(const std::string &s, const std::vector<std::string> &vec) {
     bool found = false;
@@ -37,7 +40,7 @@ public:
 
     void printTableToFile(std::ofstream& out);
 
-    void checkInputTokens(const std::vector<Token>& input);
+    AST::AbstractSyntaxTree<Token*>* checkInputTokens(const std::vector<Token>& input);
 };
 
 
