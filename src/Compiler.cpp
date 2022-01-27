@@ -331,49 +331,46 @@ void constructFunc(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &nod
 
 
     //unpack output
-//    if (by_ref) {
-//        int i = 1;
-//        for (const std::string &name: args) {
-//            int name_i = program.findValue(PyUnicode_FromStringAndSize(name.c_str(), name.size()));
-//            std::string output_name = "z" + std::to_string(i);
-//            int output = program.findValueOrAdd(PyUnicode_FromStringAndSize(output_name.c_str(), output_name.size()));
-//            program << LOAD_NAME << (unsigned char) module << EOL;
-//            program << LOAD_ATTR << (unsigned char) output << EOL;
-//            program << STORE_NAME << (unsigned char) name_i << EOL;
-//        }
-//    } else {
-//        int attr_error = program.findValueOrAdd(PyUnicode_FromStringAndSize("AttributeError", 14));
-//
-//        program << SETUP_FINALLY << (unsigned char) 10 << EOL;
-//        int start = program.getLineNo();
-//        int i = 1;
-//        for (const std::string &name: args) {
-//            int name_i = program.findValue(PyUnicode_FromStringAndSize(name.c_str(), name.size()));
-//            std::string output_name = "z" + std::to_string(i);
-//            int output = program.findValueOrAdd(PyUnicode_FromStringAndSize(output_name.c_str(), output_name.size()));
-//            program << LOAD_NAME << (unsigned char) module << EOL;
-//            program << LOAD_ATTR << (unsigned char) output << EOL;
-//            program << STORE_NAME << (unsigned char) output << EOL;
-//        }
-//        program << POP_BLOCK << (unsigned char) 0 << EOL;
-//        program << JUMP_ABSOLUTE << (unsigned char) start << EOL;
-//
-//        program << DUP_TOP << (unsigned char) 0 << EOL;
-//        program << LOAD_NAME << (unsigned char) attr_error << EOL;
-//        int jump = program.getLineNo() + 18;
-//        program << JUMP_IF_NOT_EXC_MATCH << (unsigned int) jump << EOL;
-//        program << POP_TOP << (unsigned char) 0 << EOL;
-//        program << POP_TOP << (unsigned char) 0 << EOL;
-//        program << POP_TOP << (unsigned char) 0 << EOL;
-//
-//        program << POP_EXCEPT << (unsigned char) 0 << EOL;
-//        jump = program.getLineNo() + 12;
-//        program << JUMP_ABSOLUTE << (unsigned char) jump << EOL;
-//        program << POP_EXCEPT << (unsigned char) 0 << EOL;
-//        program << JUMP_ABSOLUTE << (unsigned char) start << EOL;
-//        program << RERAISE << (unsigned char) 0 << EOL;
-//        program << JUMP_ABSOLUTE << (unsigned char) start << EOL;
-//    }
+    if (by_ref) {
+        int i = 1;
+        for (const std::string &name: args) {
+            int name_i = program.findValue(PyUnicode_FromStringAndSize(name.c_str(), name.size()));
+            std::string output_name = "z" + std::to_string(i);
+            int output = program.findValueOrAdd(PyUnicode_FromStringAndSize(output_name.c_str(), output_name.size()));
+            program << LOAD_NAME << (unsigned char) module << EOL;
+            program << LOAD_ATTR << (unsigned char) output << EOL;
+            program << STORE_NAME << (unsigned char) name_i << EOL;
+        }
+    } else {
+        int attr_error = program.findValueOrAdd(PyUnicode_FromStringAndSize("AttributeError", 14));
+
+        program << SETUP_FINALLY << (unsigned char) 10 << EOL;
+        int start = program.getLineNo();
+        int i = 1;
+        for (const std::string &name: args) {
+            int name_i = program.findValue(PyUnicode_FromStringAndSize(name.c_str(), name.size()));
+            std::string output_name = "z" + std::to_string(i);
+            int output = program.findValueOrAdd(PyUnicode_FromStringAndSize(output_name.c_str(), output_name.size()));
+            program << LOAD_NAME << (unsigned char) module << EOL;
+            program << LOAD_ATTR << (unsigned char) output << EOL;
+            program << STORE_NAME << (unsigned char) output << EOL;
+        }
+        program << POP_BLOCK << (unsigned char) 0 << EOL;
+        program << JUMP_FORWARD << (unsigned char) 18 << EOL;
+
+        program << DUP_TOP << (unsigned char) 0 << EOL;
+        program << LOAD_NAME << (unsigned char) attr_error << EOL;
+        int jump = program.getLineNo() + 18;
+        program << JUMP_IF_NOT_EXC_MATCH << (unsigned int) jump << EOL;
+        program << POP_TOP << (unsigned char) 0 << EOL;
+        program << POP_TOP << (unsigned char) 0 << EOL;
+        program << POP_TOP << (unsigned char) 0 << EOL;
+
+        program << POP_EXCEPT << (unsigned char) 0 << EOL;
+        jump = program.getLineNo() + 12;
+        program << JUMP_FORWARD << (unsigned char) 2 << EOL;
+        program << RERAISE << (unsigned char) 0 << EOL;
+    }
 }
 
 
@@ -397,43 +394,43 @@ void compileNode(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &node,
             program << IMPORT_NAME << (unsigned char) sys << EOL;
             program << STORE_NAME << (unsigned char) sys << EOL;
 
-//            program << LOAD_NAME << (unsigned char) enumerate << EOL;
-//            program << LOAD_NAME << (unsigned char) sys << EOL;
-//            program << LOAD_ATTR << (unsigned char) argv << EOL;
-//            program << CALL_FUNCTION << (unsigned char) 1 << EOL;
-//            program << GET_ITER << (unsigned char) 0 << EOL;
-//            program << FOR_ITER << (unsigned char) 52;
-//            int start = program.getLineNo();
-//            program << UNPACK_SEQUENCE << (unsigned char) 2 << EOL;
-//            program << STORE_NAME << (unsigned char) i << EOL;
-//            program << STORE_NAME << (unsigned char) v << EOL;
-//
-//            program << SETUP_FINALLY << (unsigned char) 24 << EOL;
-//
-//            program << LOAD_NAME << (unsigned char) int_ << EOL;
-//            program << LOAD_NAME << (unsigned char) v << EOL;
-//            program << CALL_FUNCTION << (unsigned char) 1 << EOL;
-//            program << LOAD_NAME << (unsigned char) gloabls << EOL;
-//            program << CALL_FUNCTION << (unsigned char) 0 << EOL;
-//            program << LOAD_CONST << (unsigned char) x << EOL;
-//            program << LOAD_NAME << (unsigned char) i << EOL;
-//            program << FORMAT_VALUE << (unsigned char) 0 << EOL;
-//            program << BUILD_STRING << (unsigned char) 2 << EOL;
-//            program << STORE_SUBSCR << (unsigned char) 0 << EOL;
-//            program << POP_BLOCK << (unsigned char) 0 << EOL;
-//            program << JUMP_ABSOLUTE << (unsigned int) start << EOL;
-//
-//            program << DUP_TOP << (unsigned char) 0 << EOL;
-//            program << LOAD_NAME << (unsigned char) value_error << EOL;
-//            program << JUMP_IF_NOT_EXC_MATCH << (unsigned int) 68 << EOL;
-//            program << POP_TOP << (unsigned char) 0 << EOL;
-//            program << POP_TOP << (unsigned char) 0 << EOL;
-//            program << POP_TOP << (unsigned char) 0 << EOL;
-//
-//            program << POP_EXCEPT << (unsigned char) 0 << EOL;
-//            program << JUMP_ABSOLUTE << (unsigned int) start << EOL;
-//            program << RERAISE << (unsigned char) 0 << EOL;
-//            program << JUMP_ABSOLUTE << (unsigned int) start << EOL;
+            program << LOAD_NAME << (unsigned char) enumerate << EOL;
+            program << LOAD_NAME << (unsigned char) sys << EOL;
+            program << LOAD_ATTR << (unsigned char) argv << EOL;
+            program << CALL_FUNCTION << (unsigned char) 1 << EOL;
+            program << GET_ITER << (unsigned char) 0 << EOL;
+            program << FOR_ITER << (unsigned char) 52;
+            int start = program.getLineNo();
+            program << UNPACK_SEQUENCE << (unsigned char) 2 << EOL;
+            program << STORE_NAME << (unsigned char) i << EOL;
+            program << STORE_NAME << (unsigned char) v << EOL;
+
+            program << SETUP_FINALLY << (unsigned char) 24 << EOL;
+
+            program << LOAD_NAME << (unsigned char) int_ << EOL;
+            program << LOAD_NAME << (unsigned char) v << EOL;
+            program << CALL_FUNCTION << (unsigned char) 1 << EOL;
+            program << LOAD_NAME << (unsigned char) gloabls << EOL;
+            program << CALL_FUNCTION << (unsigned char) 0 << EOL;
+            program << LOAD_CONST << (unsigned char) x << EOL;
+            program << LOAD_NAME << (unsigned char) i << EOL;
+            program << FORMAT_VALUE << (unsigned char) 0 << EOL;
+            program << BUILD_STRING << (unsigned char) 2 << EOL;
+            program << STORE_SUBSCR << (unsigned char) 0 << EOL;
+            program << POP_BLOCK << (unsigned char) 0 << EOL;
+            program << JUMP_ABSOLUTE << (unsigned int) start << EOL;
+
+            program << DUP_TOP << (unsigned char) 0 << EOL;
+            program << LOAD_NAME << (unsigned char) value_error << EOL;
+            program << JUMP_IF_NOT_EXC_MATCH << (unsigned int) 68 << EOL;
+            program << POP_TOP << (unsigned char) 0 << EOL;
+            program << POP_TOP << (unsigned char) 0 << EOL;
+            program << POP_TOP << (unsigned char) 0 << EOL;
+
+            program << POP_EXCEPT << (unsigned char) 0 << EOL;
+            program << JUMP_ABSOLUTE << (unsigned int) start << EOL;
+            program << RERAISE << (unsigned char) 0 << EOL;
+            program << JUMP_ABSOLUTE << (unsigned int) start << EOL;
         }
             break;
         case while_:
