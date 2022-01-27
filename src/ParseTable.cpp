@@ -4,6 +4,8 @@
 
 #include <fstream>
 #include "ParseTable.h"
+#include <algorithm>
+
 
 ParseTable::ParseTable(const DFA &dfa) {
     terminals = dfa.getTerminals();
@@ -123,6 +125,115 @@ void ParseTable::printTableToFile(std::ofstream &out) {
     }
 }
 
-void ParseTable::checkInputTokens(std::vector<Token>) {
-
+std::string getTypeString(enum TokenType type){
+    switch(type) {
+        case while_ :
+            return "while";
+        case incr_ :
+            return "incr";
+        case decr_ :
+            return "decr";
+        case print_ :
+            return "print";
+        case import_ :
+            return "import";
+        case identifier_ :
+            return "identifier";
+        case number_ :
+            return "number";
+        case operator_ :
+            return "operator";
+        case lparen_ :
+            return "lparen";
+        case rparen_ :
+            return "rparen";
+        case lbrace_ :
+            return "lbrace";
+        case rbrace_ :
+            return "rbrace";
+        case semicolon_ :
+            return "semicolon";
+        case colon_ :
+            return "colon";
+        case comma_ :
+            return "comma";
+        case inplace_ :
+            return "inplace";
+        case filename_ :
+            return "filename";
+        case const_ :
+            return "const";
+        case newline_ :
+            return "newline";
+    }
+    return {};
 }
+
+void ParseTable::checkInputTokens(const std::vector<Token> &input) {
+    //TODO Create Abstract syntax tree
+    std::vector<std::string> contents = {table.begin()->first};
+    std::vector<Token> remainingInput = input;
+    while(contents[contents.size()-1] != "accept"){
+        if(remainingInput.empty()){
+            if(table[contents[contents.size()-1]]["EOS"].empty()){
+                //TODO error detection
+            }else {
+                computeOperation(contents,remainingInput, table[contents[contents.size()-1]]["EOS"]);
+            }
+        }else {
+            Token token = remainingInput[0];
+            //TODO add to abstract syntax tree
+            if(token.type == newline_) {
+                remainingInput.erase(remainingInput.begin());
+                continue;
+            }
+            if(table[contents[contents.size()-1]][getTypeString(token.type)].empty()){
+                //TODO error detection
+            }else{
+                computeOperation(contents, remainingInput, table[contents[contents.size()-1]][getTypeString(token.type)],
+                                 getTypeString(token.type));
+            }
+        }
+    }
+}
+
+void ParseTable::computeOperation(std::vector<std::string> &contents, std::vector<Token> &remainingInput, const std::string &operation, const std::string token) {
+    //Shifts
+    if(operation.find("shift") != operation.npos){
+        contents.push_back(token);
+        std::string state = operation.substr(6,state.size()-1);
+        contents.push_back(state);
+        remainingInput.erase(remainingInput.begin());
+    }
+
+    //Productions
+    else if(operation.find("->") != operation.npos){
+        std::string replaceItems = operation.substr(operation.find("->")+3);
+        std::string newVar = operation.substr(0,operation.find("->")-1);
+
+        std::vector<std::string> go_to;
+        int pos = 0;
+        while(replaceItems.find(" ") != std::string::npos){
+            pos = replaceItems.find(" ");
+            go_to.push_back(replaceItems.substr(0,pos));
+            replaceItems.erase(0,pos+1);
+        }
+        for(int i = 0; i < go_to.size(); i++){
+            if(contents[contents.size()-2-(2*i)] == go_to[i]){
+                continue;
+            }else {
+                //TODO error detection
+            }
+        }
+        contents.erase(contents.end()-(2*(go_to.size())), contents.end());
+        contents.push_back(newVar);
+        contents.push_back(table[contents[contents.size()-2]][newVar]);
+    }
+
+    //Accept
+    else if(operation == "accept"){
+        contents.push_back("accept");
+    }
+}
+
+

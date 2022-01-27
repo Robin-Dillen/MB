@@ -33,16 +33,16 @@ private:
 
     void moveLocSym(std::map<std::string, std::vector<std::vector<std::string>>> &prods);
 
-    void getClosure(const DFAState *rootState, std::map<std::string, std::vector<std::vector<std::string>>> &prods);
+    void getClosure(std::map<std::string, std::vector<std::vector<std::string>>> &prods);
 
-    void getClosure(const DFAState *rootstate, std::string item,
-                    std::map<std::string, std::vector<std::vector<std::string>>> &closure);
+    void getClosure(std::string item, std::map<std::string, std::vector<std::vector<std::string>>> &closure);
 
     DFAState *stateExists(const std::map<std::string, std::vector<std::vector<std::string>>> &prods);
 
     CFG *cfg;
     std::string locSymbole{"."};
     std::vector<DFAState *> dfaStates;
+    DFAState* UpperRoot;
 };
 
 

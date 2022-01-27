@@ -1,6 +1,5 @@
 
 #include "Lexer.h"
-
 #include <iostream>
 #include <algorithm>
 #include <cmath>
@@ -19,12 +18,12 @@ void Lexer::tokenize(const std::string &str) {
     std::string filenameStr;
     std::string NumStr;
     std::string punctStr;
+    std::string opertatorStr;
 
     bool readfunction = false;
     int count = 1;
 
     for (const char Char: str) {
-
 
         // check for new line
         if (Char == '\n') {
@@ -37,6 +36,11 @@ void Lexer::tokenize(const std::string &str) {
             if (!NumStr.empty()) {
                 Tokens.push_back(Token(number_, NumStr));
                 NumStr = "";
+            }
+            /// check if we just stopped reading an operator
+            if (!opertatorStr.empty()) {
+                Tokens.push_back(Token(operator_, opertatorStr));
+                opertatorStr = "";
             }
 
             if (readfunction) {
@@ -54,7 +58,10 @@ void Lexer::tokenize(const std::string &str) {
             } else if (IdentifierStr == "while") {
                 Tokens.push_back(Token(while_, IdentifierStr));
                 IdentifierStr = "";
-            } else if (IdentifierStr == "const") {
+            } else if (IdentifierStr == "print") {
+                Tokens.push_back(Token(print_, IdentifierStr));
+                IdentifierStr = "";
+            }else if (IdentifierStr == "const") {
                 Tokens.push_back(Token(const_, IdentifierStr));
                 IdentifierStr = "";
             } else if (IdentifierStr == "inplace") {
@@ -81,10 +88,17 @@ void Lexer::tokenize(const std::string &str) {
                 filenameStr = "";
                 readfunction = false;
             }
+            /// check if we just stopped reading an operator
+            if (!opertatorStr.empty()) {
+                Tokens.push_back(Token(operator_, opertatorStr));
+                opertatorStr = "";
+            }
 
             NumStr += Char;
 
         } else if (ispunct(Char)) {   // punctuation character : [!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~.]
+            bool punctfound = false;
+
             /// check if we just stopped reading an IdentifierStr
             if (!IdentifierStr.empty()) {
                 Tokens.push_back(Token(identifier_, IdentifierStr));
@@ -103,53 +117,55 @@ void Lexer::tokenize(const std::string &str) {
                 readfunction = false;
             }
 
-            punctStr += Char;
 
-            if (punctStr == "<") {
-                Tokens.push_back(Token(operator_, punctStr));
-                punctStr = "";
-            } else if (punctStr == ">") {
-                Tokens.push_back(Token(operator_, punctStr));
-                punctStr = "";
-            } else if (punctStr == "=") {
-                Tokens.push_back(Token(operator_, punctStr));
-                punctStr = "";
-            } else if (punctStr == "<=") {
-                Tokens.push_back(Token(operator_, punctStr));
-                punctStr = "";
-            } else if (punctStr == ">=") {
-                Tokens.push_back(Token(operator_, punctStr));
-                punctStr = "";
-            } else if (punctStr == "!=") {
-                Tokens.push_back(Token(operator_, punctStr));
-                punctStr = "";
-            } else if (punctStr == "{") {
+            punctStr = Char;
+
+            if (punctStr == "{") {
                 Tokens.push_back(Token(lbrace_, punctStr));
                 punctStr = "";
+                punctfound = true;
             } else if (punctStr == "}") {
                 Tokens.push_back(Token(rbrace_, punctStr));
                 punctStr = "";
+                punctfound = true;
             } else if (punctStr == "(") {
                 Tokens.push_back(Token(lparen_, punctStr));
                 punctStr = "";
+                punctfound = true;
             } else if (punctStr == ")") {
                 Tokens.push_back(Token(rparen_, punctStr));
                 punctStr = "";
+                punctfound = true;
             } else if (punctStr == ";") {
                 Tokens.push_back(Token(semicolon_, punctStr));
                 punctStr = "";
+                punctfound = true;
             } else if (punctStr == ",") {
                 Tokens.push_back(Token(comma_, punctStr));
                 punctStr = "";
+                punctfound = true;
             } else if (punctStr == ":") {
                 Tokens.push_back(Token(colon_, punctStr));
                 punctStr = "";
+                punctfound = true;
+            }else{
+                opertatorStr += Char;
             }
-        } else {
+            if(punctfound && !opertatorStr.empty()){
+                Tokens.push_back(Token(operator_, opertatorStr));
+                opertatorStr = "";
+                swapLastEl(Tokens);
+            }
+        } else{
             /// check if we just stopped reading an IdentifierStr
             if (!IdentifierStr.empty()) {
                 Tokens.push_back(Token(identifier_, IdentifierStr));
                 IdentifierStr = "";
+            }
+            /// check if we just stopped reading an operator
+            if (!opertatorStr.empty()) {
+                Tokens.push_back(Token(operator_, opertatorStr));
+                opertatorStr = "";
             }
             /// check if we just stopped reading a number
             if (!NumStr.empty()) {
@@ -164,6 +180,23 @@ void Lexer::tokenize(const std::string &str) {
                 readfunction = false;
             }
         }
+    }
+    /// check if we just stopped reading an IdentifierStr
+    if (!IdentifierStr.empty()) {
+        Tokens.push_back(Token(identifier_, IdentifierStr));
+    }
+    /// check if we just stopped reading an operator
+    if (!opertatorStr.empty()) {
+        Tokens.push_back(Token(operator_, opertatorStr));
+    }
+    /// check if we just stopped reading a number
+    if (!NumStr.empty()) {
+        Tokens.push_back(Token(number_, NumStr));
+    }
+    /// check if we just stopped reading a filenameStr
+    if (!filenameStr.empty()) {
+        Tokens.push_back(Token(filename_, filenameStr));
+        filenames.push_back(filenameStr);
     }
 }
 
@@ -178,9 +211,14 @@ void Lexer::printTokens() {
     }
 }
 
-void Lexer::printTokenString() {
+void Lexer::printTokenString(){
     for (Token token: Tokens) {
-        std::cout << getTokenName(token) << "";
+        if(getTokenName(token) == "newline"){
+            std::cout << std::endl;
+        }
+        else{
+            std::cout << getTokenName(token) << " ";
+        }
     }
     std::cout << std::endl;
 }
@@ -232,4 +270,10 @@ std::string Lexer::getTokenName(const Token &token) const {
         default:
             return "unknownType";
     }
+}
+
+void Lexer::swapLastEl(std::vector<Token> &vector1) {
+    Token tremp = vector1.back();
+    vector1[vector1.size()-1] = vector1[vector1.size()-2];
+    vector1[vector1.size()-2] = tremp;
 }

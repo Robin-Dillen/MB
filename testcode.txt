@@ -1,12 +1,4 @@
 import clear;
-
-inplace clear Aux, Tomorrow;
 while Today != 0 {
     incr Aux;
-    decr Today;
-}
-while Aux != 0 {
-    incr Today;
-    incr Tomorrow;
-    decr Aux;
 }

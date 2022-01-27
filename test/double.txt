@@ -1,0 +1,10 @@
+import clear;
+
+inplace clear Aux;
+while Aux < x1 {
+    incr Aux;
+}
+while Aux != 0 {
+    incr x1;
+    decr Aux;
+}
