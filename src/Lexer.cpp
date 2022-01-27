@@ -58,7 +58,10 @@ void Lexer::tokenize(const std::string &str) {
             } else if (IdentifierStr == "while") {
                 Tokens.push_back(Token(while_, IdentifierStr));
                 IdentifierStr = "";
-            } else if (IdentifierStr == "const") {
+            } else if (IdentifierStr == "print") {
+                Tokens.push_back(Token(print_, IdentifierStr));
+                IdentifierStr = "";
+            }else if (IdentifierStr == "const") {
                 Tokens.push_back(Token(const_, IdentifierStr));
                 IdentifierStr = "";
             } else if (IdentifierStr == "inplace") {
