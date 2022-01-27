@@ -29,7 +29,7 @@ class ParseTable {
     std::string locSymbole = ".";
     std::map<std::string, unsigned int> colWidths;
 
-    bool computeOperation(std::vector<std::string> &contents, std::vector<Token> &remainingInput, const std::string &operation, const std::string token = "EOS");
+    bool computeOperation(std::vector<std::string> &contents, std::vector<Token> &remainingInput, const std::string &operation, std::string token = "EOS");
 public:
     explicit ParseTable(const DFA &dfa);
 
