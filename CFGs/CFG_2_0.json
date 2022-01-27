@@ -1,16 +1,16 @@
 {
   "Variables": ["ROOT","ASSIGN", "LOOP", "BODY", "FUNCTIONNAME", "CONDITION", "DIGIT", "OPERATION", "ARGUMENT", "IMPORT", "IDENTIFIER", "TEMPBODY", "TEMPIMPORT"],
   "Terminals": ["while", "incr", "decr", "print", "import", "identifier", "number", "operator", "lparen", "rparen", "lbrace", "rbrace", "semicolon",
-  "comma", "inplace", "filename", "const"
+  "comma", "inplace", "filename", "const", "epsilon_"
   ],
   "Productions": [
     {"head": "ROOT", "body": ["IMPORT","BODY"]},
     {"head": "IMPORT", "body": ["TEMPIMPORT","IMPORT"]},
-    {"head": "IMPORT", "body": []},
+    {"head": "IMPORT", "body": ["epsilon_"]},
     {"head": "TEMPIMPORT", "body": ["import", "FUNCTIONNAME", "semicolon"]},
     {"head": "LOOP", "body": ["while", "CONDITION", "lbrace", "BODY", "rbrace"]},
     {"head": "BODY", "body": ["TEMPBODY","BODY"]},
-    {"head": "BODY", "body": []},
+    {"head": "BODY", "body": ["epsilon_"]},
     {"head": "TEMPBODY", "body": ["ASSIGN"]},
     {"head": "TEMPBODY", "body": ["LOOP"]},
     {"head": "ASSIGN", "body": ["incr", "IDENTIFIER", "semicolon"]},

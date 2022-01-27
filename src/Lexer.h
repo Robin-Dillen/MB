@@ -16,7 +16,7 @@ public:
 
     void printTokenString();
 
-    const std::vector<Token> &getTokens() const;
+    const std::vector<Token> &getTokens();
 
 private:
 
@@ -25,6 +25,8 @@ private:
     std::vector<Token> Tokens;
 
     void swapLastEl(std::vector<Token> &vector1);
+
+    void addEpsilon();
 };
 
 

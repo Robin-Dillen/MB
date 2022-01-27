@@ -125,6 +125,7 @@ void Lexer::tokenize(const std::string &str) {
                 punctStr = "";
                 punctfound = true;
             } else if (punctStr == "}") {
+                Tokens.push_back(Token(epsilon_, "#"));
                 Tokens.push_back(Token(rbrace_, punctStr));
                 punctStr = "";
                 punctfound = true;
@@ -212,6 +213,7 @@ void Lexer::printTokens() {
 }
 
 void Lexer::printTokenString(){
+    this->addEpsilon();
     for (Token token: Tokens) {
         if(getTokenName(token) == "newline"){
             std::cout << std::endl;
@@ -222,8 +224,37 @@ void Lexer::printTokenString(){
     }
     std::cout << std::endl;
 }
+void Lexer::addEpsilon(){
+    int imprt_counter = 0;
+    for (Token token: Tokens) {
+        if(token.type == import_){
+            imprt_counter += 1;
+        }
+    }
+    int index = 0;
+    bool newline = false;
+    int imprt_counter_ = 0;
+    for (Token token: Tokens) {
+        if(token.type == import_){
+            imprt_counter_ += 1;
+        }
+        if(imprt_counter == imprt_counter_){
+            newline = true;
+        }
+        if(newline && token.type == newline_){
+            break;
+        }
+        index += 1;
+    }
 
-const std::vector<Token> &Lexer::getTokens() const {
+
+    auto itPos = Tokens.begin() + index;
+    Tokens.insert(itPos, Token(epsilon_, "#"));
+    Tokens.push_back(Token(epsilon_, "#"));
+}
+
+const std::vector<Token> &Lexer::getTokens() {
+    this->addEpsilon();
     return Tokens;
 }
 
