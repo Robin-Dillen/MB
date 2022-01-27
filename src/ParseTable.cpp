@@ -175,7 +175,7 @@ AST::AbstractSyntaxTree<Token*>* ParseTable::checkInputTokens(const std::vector<
                 case inplace_:
                 case import_:
                 case identifier_:
-                    if (current.top()->getData()->type == func_ || current.top()->getData()->type == print_) break;
+                    if (current.top()->getData()->type == func_ || current.top()->getData()->type == print_ || remainingInput[1].type != operator_) break;
                     cache = token;
                     goto exit_check;
 
