@@ -23,7 +23,6 @@
     {"head": "ASSIGN", "body": ["const","IDENTIFIER", "OPERATION", "DIGIT", "semicolon"]},
     {"head": "ASSIGN", "body": ["print", "lparen", "IDENTIFIER", "rparen", "semicolon"]},
     {"head": "ARGUMENT", "body": ["IDENTIFIER"]},
-    {"head": "CONDITION", "body": ["IDENTIFIER", "OPERATION", "IDENTIFIER"]},
     {"head": "CONDITION", "body": ["IDENTIFIER", "OPERATION", "DIGIT"]},
     {"head": "CONDITION", "body": ["DIGIT", "OPERATION", "IDENTIFIER"]},
     {"head": "CONDITION", "body": ["DIGIT", "OPERATION", "DIGIT"]},

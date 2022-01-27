@@ -1,12 +1,6 @@
-import clear;
+x = 5;
 while x != 0 {
-    incr x;
-    decr y;
-    while y < 2 {
-        incr y;
-    }
-}
-while y < 2 {
-    x = 5;
     print(x);
+    decr x;
 }
+
