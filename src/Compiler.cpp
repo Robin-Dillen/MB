@@ -165,7 +165,7 @@ void constructWhile(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &no
     int name_index = program.findValueOrAdd(py_name);
 
     int const_index = program.findConstOrAdd(PyLong_FromLong(0));
-    int begin = program.getLineNo();
+    int begin = program.getLineNo() + 2;
 
     program << LOAD_NAME << (unsigned char) name_index << EOL;
     program << LOAD_CONST << (unsigned char) const_index << EOL;
@@ -183,7 +183,7 @@ void constructWhile(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &no
         ++node_cpy;
     } while (node_cpy->getData()->getType() != end_);
     std::cout << temp.getLineNo() << std::endl;
-    program << POP_JUMP_IF_FALSE << (unsigned char) (program.getLineNo() + temp.getLineNo() + 4)
+    program << POP_JUMP_IF_FALSE << (unsigned char) (program.getLineNo() + temp.getLineNo() + 6)
             << EOL; // +2 for current op and +2 for jump absolute
     do {
         compileNode(node, program);
@@ -226,11 +226,11 @@ void constructDecr(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &nod
     program << LOAD_CONST << (unsigned char) const_index << EOL;
     program << COMPARE_OP << (unsigned char) LT << EOL;
     int current_lineno = program.getLineNo();
-    program << POP_JUMP_IF_FALSE << (unsigned char) current_lineno + 8 << EOL;
+    program << POP_JUMP_IF_FALSE << (unsigned char) current_lineno + 12 << EOL;
     program << LOAD_NAME << (unsigned char) name_index << EOL;
     const_index = program.findConstOrAdd(PyLong_FromLongLong(4294967296));
     program << LOAD_CONST << (unsigned char) const_index << EOL;
-    program << INPLACE_SUBTRACT << (unsigned char) 0 << EOL;
+    program << INPLACE_ADD << (unsigned char) 0 << EOL;
     program << STORE_NAME << (unsigned char) name_index << EOL;
 }
 
@@ -376,58 +376,59 @@ void compileNode(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &node,
     switch (node->getData()->getType()) {
         case root_:
         {
-//            int zero = program.findConstOrAdd(PyLong_FromLong(0));
-//            int none = program.findConstOrAdd(Py_None);
-//            int sys = program.findValueOrAdd(PyUnicode_FromStringAndSize("sys", 3));
-//            int enumerate = program.findValueOrAdd(PyUnicode_FromStringAndSize("enumerate", 9));
-//            int argv = program.findValueOrAdd(PyUnicode_FromStringAndSize("argv", 4));
-//            int i = program.findValueOrAdd(PyUnicode_FromStringAndSize("i", 1));
-//            int x = program.findConstOrAdd(PyUnicode_FromStringAndSize("x", 1));
-//            int v = program.findValueOrAdd(PyUnicode_FromStringAndSize("v", 1));
-//            int int_ = program.findValueOrAdd(PyUnicode_FromStringAndSize("int", 3));
-//            int gloabls = program.findValueOrAdd(PyUnicode_FromStringAndSize("globals", 7));
-//            int value_error = program.findValueOrAdd(PyUnicode_FromStringAndSize("ValueError", 10));
-//            program << LOAD_CONST << (unsigned char) zero << EOL;
-//            program << LOAD_CONST << (unsigned char) none << EOL;
-//            program << IMPORT_NAME << (unsigned char) sys << EOL;
-//            program << STORE_NAME << (unsigned char) sys << EOL;
-//
-//            program << LOAD_NAME << (unsigned char) enumerate << EOL;
-//            program << LOAD_NAME << (unsigned char) sys << EOL;
-//            program << LOAD_ATTR << (unsigned char) argv << EOL;
-//            program << GET_ITER << (unsigned char) 0 << EOL;
-//            program << FOR_ITER << (unsigned char) 52;
-//            int start = program.getLineNo();
-//            program << UNPACK_SEQUENCE << (unsigned char) 2 << EOL;
-//            program << STORE_NAME << (unsigned char) i << EOL;
-//            program << STORE_NAME << (unsigned char) v << EOL;
-//
-//            program << SETUP_FINALLY << (unsigned char) 24 << EOL;
-//
-//            program << LOAD_NAME << (unsigned char) int_ << EOL;
-//            program << LOAD_NAME << (unsigned char) v << EOL;
-//            program << CALL_FUNCTION << (unsigned char) 1 << EOL;
-//            program << LOAD_NAME << (unsigned char) gloabls << EOL;
-//            program << CALL_FUNCTION << (unsigned char) 0 << EOL;
-//            program << LOAD_CONST << (unsigned char) x << EOL;
-//            program << LOAD_NAME << (unsigned char) i << EOL;
-//            program << FORMAT_VALUE << (unsigned char) 0 << EOL;
-//            program << BUILD_STRING << (unsigned char) 2 << EOL;
-//            program << STORE_SUBSCR << (unsigned char) 0 << EOL;
-//            program << POP_BLOCK << (unsigned char) 0 << EOL;
-//            program << JUMP_ABSOLUTE << (unsigned int) start << EOL;
-//
-//            program << DUP_TOP << (unsigned char) 0 << EOL;
-//            program << LOAD_NAME << (unsigned char) value_error << EOL;
-//            program << JUMP_IF_NOT_EXC_MATCH << (unsigned int) 68 << EOL;
-//            program << POP_TOP << (unsigned char) 0 << EOL;
-//            program << POP_TOP << (unsigned char) 0 << EOL;
-//            program << POP_TOP << (unsigned char) 0 << EOL;
-//
-//            program << POP_EXCEPT << (unsigned char) 0 << EOL;
-//            program << JUMP_ABSOLUTE << (unsigned int) start << EOL;
-//            program << RERAISE << (unsigned char) 0 << EOL;
-//            program << JUMP_ABSOLUTE << (unsigned int) start << EOL;
+            int zero = program.findConstOrAdd(PyLong_FromLong(0));
+            int none = program.findConstOrAdd(Py_None);
+            int sys = program.findValueOrAdd(PyUnicode_FromStringAndSize("sys", 3));
+            int enumerate = program.findValueOrAdd(PyUnicode_FromStringAndSize("enumerate", 9));
+            int argv = program.findValueOrAdd(PyUnicode_FromStringAndSize("argv", 4));
+            int i = program.findValueOrAdd(PyUnicode_FromStringAndSize("i", 1));
+            int x = program.findConstOrAdd(PyUnicode_FromStringAndSize("x", 1));
+            int v = program.findValueOrAdd(PyUnicode_FromStringAndSize("v", 1));
+            int int_ = program.findValueOrAdd(PyUnicode_FromStringAndSize("int", 3));
+            int gloabls = program.findValueOrAdd(PyUnicode_FromStringAndSize("globals", 7));
+            int value_error = program.findValueOrAdd(PyUnicode_FromStringAndSize("ValueError", 10));
+            program << LOAD_CONST << (unsigned char) zero << EOL;
+            program << LOAD_CONST << (unsigned char) none << EOL;
+            program << IMPORT_NAME << (unsigned char) sys << EOL;
+            program << STORE_NAME << (unsigned char) sys << EOL;
+
+            program << LOAD_NAME << (unsigned char) enumerate << EOL;
+            program << LOAD_NAME << (unsigned char) sys << EOL;
+            program << LOAD_ATTR << (unsigned char) argv << EOL;
+            program << CALL_FUNCTION << (unsigned char) 1 << EOL;
+            program << GET_ITER << (unsigned char) 0 << EOL;
+            program << FOR_ITER << (unsigned char) 52;
+            int start = program.getLineNo();
+            program << UNPACK_SEQUENCE << (unsigned char) 2 << EOL;
+            program << STORE_NAME << (unsigned char) i << EOL;
+            program << STORE_NAME << (unsigned char) v << EOL;
+
+            program << SETUP_FINALLY << (unsigned char) 24 << EOL;
+
+            program << LOAD_NAME << (unsigned char) int_ << EOL;
+            program << LOAD_NAME << (unsigned char) v << EOL;
+            program << CALL_FUNCTION << (unsigned char) 1 << EOL;
+            program << LOAD_NAME << (unsigned char) gloabls << EOL;
+            program << CALL_FUNCTION << (unsigned char) 0 << EOL;
+            program << LOAD_CONST << (unsigned char) x << EOL;
+            program << LOAD_NAME << (unsigned char) i << EOL;
+            program << FORMAT_VALUE << (unsigned char) 0 << EOL;
+            program << BUILD_STRING << (unsigned char) 2 << EOL;
+            program << STORE_SUBSCR << (unsigned char) 0 << EOL;
+            program << POP_BLOCK << (unsigned char) 0 << EOL;
+            program << JUMP_ABSOLUTE << (unsigned int) start << EOL;
+
+            program << DUP_TOP << (unsigned char) 0 << EOL;
+            program << LOAD_NAME << (unsigned char) value_error << EOL;
+            program << JUMP_IF_NOT_EXC_MATCH << (unsigned int) 68 << EOL;
+            program << POP_TOP << (unsigned char) 0 << EOL;
+            program << POP_TOP << (unsigned char) 0 << EOL;
+            program << POP_TOP << (unsigned char) 0 << EOL;
+
+            program << POP_EXCEPT << (unsigned char) 0 << EOL;
+            program << JUMP_ABSOLUTE << (unsigned int) start << EOL;
+            program << RERAISE << (unsigned char) 0 << EOL;
+            program << JUMP_ABSOLUTE << (unsigned int) start << EOL;
         }
             break;
         case while_:
@@ -509,7 +510,7 @@ void compile(const AST::AbstractSyntaxTree<Data *> &ast) {
         }
     }
     for (int i = 0; i <= length; i++) {
-        file << marshalled[i];
+        file << (unsigned char)marshalled[i];
     }
     file.flush();
     Py_Finalize();
