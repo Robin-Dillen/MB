@@ -31,7 +31,7 @@ void Lexer::tokenize(const std::string &str) {
             count += 1;
         }
 
-        if (isalpha(Char)) { // identifier: [a-zA-Z][a-zA-Z]*
+        if (isalpha(Char) || (isdigit(Char) && !IdentifierStr.empty())) { // identifier: [a-zA-Z][a-zA-Z]*
             /// check if we just stopped reading a number
             if (!NumStr.empty()) {
                 Tokens.push_back(Token(number_, NumStr));
