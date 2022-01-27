@@ -2,11 +2,9 @@
 // Created by Khemin on 11-12-2021.
 //
 #include "ParseTable.h"
-#include "AbstractSyntaxTree/AbstractSyntaxTree.h"
 #include "lib.h"
 
 #include <fstream>
-#include <algorithm>
 #include <stack>
 
 
@@ -139,13 +137,11 @@ AST::AbstractSyntaxTree<Token*>* ParseTable::checkInputTokens(const std::vector<
     while(contents.back() != "accept"){
         if(remainingInput.empty()){
             if(table[contents.back()]["EOS"].empty()){
-                std::cout<<"error1"<<std::endl;
-                //TODO error detection
+                std::cout << "Missing token(s) on line:" << line_no - 1 <<"." << std::endl;
                 return nullptr;
             }else {
                 if(!computeOperation(contents,remainingInput, table[contents.back()]["EOS"])){
-                    std::cout<<"error3"<<std::endl;
-                    //TODO error detection
+                    std::cout << "Missing token(s) on line:" << line_no - 1 <<"." << std::endl;
                     return nullptr;
                 }
             }
@@ -220,10 +216,6 @@ AST::AbstractSyntaxTree<Token*>* ParseTable::checkInputTokens(const std::vector<
                 }
             }
             exit_check:
-            if(getTypeString(token.type) == "junk"){
-                remainingInput.erase(remainingInput.begin());
-                continue;
-            }
             int old_size = remainingInput.size();
             while (remainingInput.size() == old_size) {
                 if (table[contents.back()][getTypeString(token.type)].empty()) {
@@ -232,8 +224,7 @@ AST::AbstractSyntaxTree<Token*>* ParseTable::checkInputTokens(const std::vector<
                 } else {
                     if (!computeOperation(contents, remainingInput, table[contents.back()][getTypeString(token.type)],
                                           getTypeString(token.type))) {
-                        std::cout << "error4" << std::endl;
-                        //TODO error detection
+                        std::cout << "Line "<<line_no-1<<": Token of type "<<token.type<<" with value "<<token.value<<" is not valid in this sequence for the language." << std::endl;
                         return nullptr;
                     }
                 }
