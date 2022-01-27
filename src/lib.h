@@ -4,7 +4,7 @@
 #ifndef MB_LIB_H
 #define MB_LIB_H
 
-enum opcodes {
+enum opcodes: unsigned char {
     POP_TOP = 1,
     ROT_TWO = 2,
     ROT_THREE = 3,
