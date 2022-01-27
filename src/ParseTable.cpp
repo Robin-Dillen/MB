@@ -173,7 +173,7 @@ std::string getTypeString(enum TokenType type){
         case epsilon2_:
             return "epsilon2_";
         default:
-            return "junk";
+            return "";
     }
 }
 
@@ -250,10 +250,6 @@ void ParseTable::checkInputTokens(const std::vector<Token> &input) {
                 }
             }
             exit_check:
-            if(getTypeString(token.type) == "junk"){
-                remainingInput.erase(remainingInput.begin());
-                continue;
-            }
             if(table[contents.back()][getTypeString(token.type)].empty()){
                 std::cout<<"error2"<<std::endl;
                 //TODO error detection
@@ -267,10 +263,6 @@ void ParseTable::checkInputTokens(const std::vector<Token> &input) {
                 }
             }
         }
-        for(auto i:contents){
-            std::cout<<i;
-        }
-        std::cout<<std::endl;
     }
 }
 

@@ -24,7 +24,6 @@ void Parser::canonicalCollection() {
     getClosure(state0productions);
     DFAState *stateZero = new DFAState("0", productions, false);
     dfaStates.push_back(stateZero);
-    printState(state0productions);
     create_canonical_states(stateZero);
 
 }
@@ -55,9 +54,6 @@ void Parser::create_canonical_states(DFAState *rootState) {
                     dfaStates.push_back(state);
                     rootState->addTransition(production[i + 1], state);
                     create_canonical_states(state);
-
-                    cout<<"state name: "<<name<<endl;
-                    printState(newStateProductions);
                 }
 
             }

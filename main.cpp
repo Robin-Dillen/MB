@@ -12,12 +12,7 @@ int main(int argc, char **argv) {
     Lexer lexer(fl.getFilecontents());
     const std::vector<Token> &tokens = lexer.getTokens();
 
-    for(auto i : tokens){
-        std::cout<<i.value<< std::endl;
-    }
-
     CFG *cfg = new CFG("../CFGs/CFG_2_0.json");
-    cfg->print();
 
     Parser p(cfg);
     ParseTable table = std::move(p.getParseTable());
