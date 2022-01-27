@@ -5,10 +5,12 @@
   ],
   "Productions": [
     {"head": "ROOT", "body": ["IMPORT","BODY"]},
+    {"head": "IMPORT", "body": ["TEMPIMPORT","IMPORT"]},
     {"head": "IMPORT", "body": ["epsilon1_"]},
     {"head": "TEMPIMPORT", "body": ["import", "FUNCTIONNAME", "semicolon"]},
     {"head": "LOOP", "body": ["while", "CONDITION", "lbrace", "BODY", "rbrace"]},
-    {"head": "BODY", "body": ["epsilon2"]},
+    {"head": "BODY", "body": ["TEMPBODY","BODY"]},
+    {"head": "BODY", "body": ["epsilon2_"]},
     {"head": "TEMPBODY", "body": ["ASSIGN"]},
     {"head": "TEMPBODY", "body": ["LOOP"]},
     {"head": "ASSIGN", "body": ["incr", "IDENTIFIER", "semicolon"]},

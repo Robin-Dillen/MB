@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
         std::cout<<i.value<< std::endl;
     }
 
-    CFG *cfg = new CFG("../CFGs/CFG_2_1.json");
+    CFG *cfg = new CFG("../CFGs/CFG_2_0.json");
     cfg->print();
 
     Parser p(cfg);
