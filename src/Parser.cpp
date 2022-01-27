@@ -51,7 +51,8 @@ void Parser::create_canonical_states(DFAState *rootState) {
                     rootState->addTransition(production[i + 1], state);
                     create_canonical_states(state);
 
-
+                    cout<<name<<endl;
+                    printState(newStateProductions);
                 }
 
             }

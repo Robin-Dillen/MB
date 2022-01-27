@@ -1,4 +1,3 @@
-import clear;
 while Today != 0 {
     incr Aux;
 }
