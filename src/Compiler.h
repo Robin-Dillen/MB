@@ -6,7 +6,7 @@
 #ifndef AST_COMPILER_H
 #define AST_COMPILER_H
 
-void compile(const AST::AbstractSyntaxTree<Token *> &ast);
+void compile(const AST::AbstractSyntaxTree<Data *> &ast);
 
 
 #endif //AST_COMPILER_H
