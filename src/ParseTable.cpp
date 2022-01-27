@@ -197,48 +197,55 @@ void ParseTable::checkInputTokens(const std::vector<Token> &input) {
             }
         }else {
             Token token = remainingInput.front();
-            remainingInput.erase(remainingInput.begin());
             switch (token.type) {
                 case newline_:
                     ++line_no;
+                    remainingInput.erase(remainingInput.begin());
                     continue;
 
                 case rparen_:
                 case rbrace_:
                     current.top()->appendChild(new AST::AbstractSyntaxTree<Token *>(new Token(end_, ""), line_no));
                     current.pop();
-                    continue;
+                    goto exit_check;
                 case semicolon_:
                     if (current.top()->getData()->type == incr_ || current.top()->getData()->type == decr_ || current.top()->getData()->type == operator_)
                         current.pop();
-                    continue;
+                    goto exit_check;
 
                 case identifier_:
                     cache = token;
-                    continue;
+                    goto exit_check;
+
+                case epsilon1_:
+                case epsilon2_:
+                    goto exit_check;
 
                 default:
                     break;
             }
-            auto new_node = new AST::AbstractSyntaxTree<Token *>(new Token(token), line_no);
-            current.top()->appendChild(new_node);
+            {
+                auto new_node = new AST::AbstractSyntaxTree<Token *>(new Token(token), line_no);
+                current.top()->appendChild(new_node);
 
-            switch (token.type) {
-                case while_:
-                case incr_:
-                case decr_:
-                case filename_:
-                case print_:
-                    current.push(new_node);
-                    break;
+                switch (token.type) {
+                    case while_:
+                    case incr_:
+                    case decr_:
+                    case filename_:
+                    case print_:
+                        current.push(new_node);
+                        break;
 
-                case operator_:
-                    if (token.value != "=") break;
-                    current.push(new_node);
-                    current.top()->appendChild(new AST::AbstractSyntaxTree<Token *>(new Token(cache), line_no));
-                    break;
+                    case operator_:
+                        if (token.value != "=") break;
+                        current.push(new_node);
+                        current.top()->appendChild(new AST::AbstractSyntaxTree<Token *>(new Token(cache), line_no));
+                        break;
 
+                }
             }
+            exit_check:
 
             if(table[contents.back()][getTypeString(token.type)].empty()){
                 std::cout<<"error2"<<std::endl;
