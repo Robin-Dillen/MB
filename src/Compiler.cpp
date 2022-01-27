@@ -279,11 +279,7 @@ void constructFunc(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &nod
     std::string module_name = identifier->get();
 
     int sys = program.findValue(PyUnicode_FromStringAndSize("sys", 3));
-    if (sys == -1) {
-        sys = program.findValueOrAdd(PyUnicode_FromStringAndSize("sys", 3));
-        program << (unsigned char) IMPORT_NAME << (unsigned char) sys << EOL;
-        program << (unsigned char) STORE_NAME << (unsigned char) sys << EOL;
-    }
+    assert(sys != -1);
 
     ++node; // second argument (list of parameters)
 
@@ -343,34 +339,91 @@ void constructFunc(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &nod
         int enumerate = program.findValueOrAdd(PyUnicode_FromStringAndSize("enumerate", 9));
         int i = program.findValueOrAdd(PyUnicode_FromStringAndSize("i", 1));
         int x = program.findValueOrAdd(PyUnicode_FromStringAndSize("x", 1));
-        int exec = program.findValueOrAdd(PyUnicode_FromStringAndSize("exec", 1));
+        int exec = program.findValueOrAdd(PyUnicode_FromStringAndSize("exec", 4));
         int z = program.findConstOrAdd(PyUnicode_FromStringAndSize("z", 1));
         int store = program.findConstOrAdd(PyUnicode_FromStringAndSize(" = x", 4));
-        program << (unsigned char) LOAD_NAME << (unsigned char) enumerate << EOL;
-        program << (unsigned char) LOAD_NAME << (unsigned char) module << EOL;
-        program << (unsigned char) LOAD_ATTR << (unsigned char) output << EOL;
-        program << (unsigned char) CALL_FUNCTION << (unsigned char) 1 << EOL;
-        program += (unsigned char) GET_ITER;
-        program << (unsigned char) FOR_ITER << (unsigned char) 24;
+        program << LOAD_NAME << (unsigned char) enumerate << EOL;
+        program << LOAD_NAME << (unsigned char) module << EOL;
+        program << LOAD_ATTR << (unsigned char) output << EOL;
+        program << CALL_FUNCTION << (unsigned char) 1 << EOL;
+        program << GET_ITER << (unsigned char) 0 << EOL;
+        program << FOR_ITER << (unsigned char) 24 << EOL;
         int begin = program.getLineNo();
-        program << (unsigned char) UNPACK_SEQUENCE << (unsigned char) 2 << EOL;
-        program << (unsigned char) STORE_NAME << (unsigned char) i << EOL;
-        program << (unsigned char) STORE_NAME << (unsigned char) x << EOL;
-        program << (unsigned char) LOAD_NAME << (unsigned char) exec << EOL;
-        program << (unsigned char) LOAD_CONST << (unsigned char) z << EOL;
-        program << (unsigned char) LOAD_NAME << (unsigned char) i << EOL;
-        program << (unsigned char) FORMAT_VALUE << (unsigned char) 0 << EOL;
-        program << (unsigned char) LOAD_CONST << (unsigned char) store << EOL;
-        program << (unsigned char) BUILD_STRING << (unsigned char) 3 << EOL;
-        program << (unsigned char) CALL_FUNCTION << (unsigned char) 1 << EOL;
-        program += (unsigned char) POP_TOP;
-        program << (unsigned char) JUMP_ABSOLUTE << (unsigned char) begin << EOL;
+        program << UNPACK_SEQUENCE << (unsigned char) 2 << EOL;
+        program << STORE_NAME << (unsigned char) i << EOL;
+        program << STORE_NAME << (unsigned char) x << EOL;
+        program << LOAD_NAME << (unsigned char) exec << EOL;
+        program << LOAD_CONST << (unsigned char) z << EOL;
+        program << LOAD_NAME << (unsigned char) i << EOL;
+        program << FORMAT_VALUE << (unsigned char) 0 << EOL;
+        program << LOAD_CONST << (unsigned char) store << EOL;
+        program << BUILD_STRING << (unsigned char) 3 << EOL;
+        program << CALL_FUNCTION << (unsigned char) 1 << EOL;
+        program << POP_TOP << (unsigned char) 0 << EOL;
+        program << JUMP_ABSOLUTE << (unsigned char) begin << EOL;
     }
 }
 
 
 void compileNode(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &node, Program &program) {
     switch (node->getData()->getType()) {
+        case root_:
+        {
+            int zero = program.findConstOrAdd(PyLong_FromLong(0));
+            int none = program.findConstOrAdd(Py_None);
+            int sys = program.findValueOrAdd(PyUnicode_FromStringAndSize("sys", 3));
+            int enumerate = program.findValueOrAdd(PyUnicode_FromStringAndSize("enumerate", 9));
+            int argv = program.findValueOrAdd(PyUnicode_FromStringAndSize("argv", 4));
+            int i = program.findValueOrAdd(PyUnicode_FromStringAndSize("i", 1));
+            int x = program.findConstOrAdd(PyUnicode_FromStringAndSize("x", 1));
+            int v = program.findValueOrAdd(PyUnicode_FromStringAndSize("v", 1));
+            int store = program.findConstOrAdd(PyUnicode_FromStringAndSize("=", 1));
+            int int_ = program.findValueOrAdd(PyUnicode_FromStringAndSize("int", 3));
+            int gloabls = program.findValueOrAdd(PyUnicode_FromStringAndSize("globals", 7));
+            int value_error = program.findValueOrAdd(PyUnicode_FromStringAndSize("ValueError", 10));
+            program << LOAD_CONST << (unsigned char) zero << EOL;
+            program << LOAD_CONST << (unsigned char) none << EOL;
+            program << IMPORT_NAME << (unsigned char) sys << EOL;
+            program << STORE_NAME << (unsigned char) sys << EOL;
+
+            program << LOAD_NAME << (unsigned char) enumerate << EOL;
+            program << LOAD_NAME << (unsigned char) sys << EOL;
+            program << LOAD_ATTR << (unsigned char) argv << EOL;
+            program << GET_ITER << (unsigned char) 0 << EOL;
+            program << FOR_ITER << (unsigned char) 52;
+            int start = program.getLineNo();
+            program << UNPACK_SEQUENCE << (unsigned char) 2 << EOL;
+            program << STORE_NAME << (unsigned char) i << EOL;
+            program << STORE_NAME << (unsigned char) v << EOL;
+
+            program << SETUP_FINALLY << (unsigned char) 24 << EOL;
+
+            program << LOAD_NAME << (unsigned char) int_ << EOL;
+            program << LOAD_NAME << (unsigned char) v << EOL;
+            program << CALL_FUNCTION << (unsigned char) 1 << EOL;
+            program << LOAD_NAME << (unsigned char) gloabls << EOL;
+            program << CALL_FUNCTION << (unsigned char) 0 << EOL;
+            program << LOAD_CONST << (unsigned char) x << EOL;
+            program << LOAD_NAME << (unsigned char) i << EOL;
+            program << FORMAT_VALUE << (unsigned char) 0 << EOL;
+            program << BUILD_STRING << (unsigned char) 2 << EOL;
+            program << STORE_SUBSCR << (unsigned char) 0 << EOL;
+            program << POP_BLOCK << (unsigned char) 0 << EOL;
+            program << JUMP_ABSOLUTE << (unsigned int) start << EOL;
+
+            program << DUP_TOP << (unsigned int) 0 << EOL;
+            program << LOAD_NAME << (unsigned char) value_error << EOL;
+            program << JUMP_IF_NOT_EXC_MATCH << (unsigned int) 68 << EOL;
+            program << POP_TOP << (unsigned char) 0 << EOL;
+            program << POP_TOP << (unsigned char) 0 << EOL;
+            program << POP_TOP << (unsigned char) 0 << EOL;
+
+            program << POP_EXCEPT << (unsigned char) 0 << EOL;
+            program << JUMP_ABSOLUTE << (unsigned int) start << EOL;
+            program << RERAISE << (unsigned char) 0 << EOL;
+            program << JUMP_ABSOLUTE << (unsigned int) start << EOL;
+        }
+            break;
         case while_:
             constructWhile(node, program);
             break;
@@ -385,7 +438,7 @@ void compileNode(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &node,
 
         case identifier_:
         case const_:
-            // possible error
+            std::cerr << "Possible error" << std::endl;
             break;
 
         case operator_:
@@ -407,8 +460,6 @@ void compileNode(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &node,
 
 void compile(const AST::AbstractSyntaxTree<Data *> &ast) {
     Program program;
-    program.findConstOrAdd(PyLong_FromLong(0));
-    program.findConstOrAdd(Py_None);
     for (auto node = ast.begin(); node != ast.end(); ++node) {
         compileNode(node, program);
     }
