@@ -33,7 +33,7 @@ map<string, vector<vector<string>>> Parser::varsToProds(const vector<Variable *>
 }
 
 void Parser::create_canonical_states(DFAState *rootState) {
-fixed     for (const auto& mapItem: rootState->getContent()) {
+     for (const auto& mapItem: rootState->getContent()) {
         for (auto production: mapItem.second) {
             int i = checkSymLoc(production);
             if (i != production.size() - 1) {
