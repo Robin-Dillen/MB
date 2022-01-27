@@ -168,8 +168,12 @@ std::string getTypeString(enum TokenType type){
             return "const";
         case newline_ :
             return "newline";
-        default:
-            return {};
+        /*case epsilon1_:
+            return "epsilon1_";
+        case epsilon2_:
+            return "epsilon2_";
+        */default:
+            return "junk";
     }
 }
 
@@ -205,7 +209,7 @@ void ParseTable::checkInputTokens(const std::vector<Token> &input) {
 
                 case rparen_:
                 case rbrace_:
-                    current.top()->appendChild(new AST::AbstractSyntaxTree<Token *>(new Token(end_, ""), line_no));
+                    //current.top()->appendChild(new AST::AbstractSyntaxTree<Token *>(new Token(end_, ""), line_no));
                     current.pop();
                     goto exit_check;
                 case semicolon_:
@@ -246,7 +250,10 @@ void ParseTable::checkInputTokens(const std::vector<Token> &input) {
                 }
             }
             exit_check:
-
+            if(getTypeString(token.type) == "junk"){
+                remainingInput.erase(remainingInput.begin());
+                continue;
+            }
             if(table[contents.back()][getTypeString(token.type)].empty()){
                 std::cout<<"error2"<<std::endl;
                 //TODO error detection

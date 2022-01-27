@@ -4,13 +4,9 @@
     "comma", "inplace", "filename", "const"
   ],
   "Productions": [
-    {"head": "ROOT", "body": ["IMPORT","BODY"]},
     {"head": "ROOT", "body": ["BODY"]},
-    {"head": "ROOT", "body": ["IMPORT"]},
-    {"head": "IMPORT", "body": ["IMPORT", "IMPORT"]},
     {"head": "IMPORT", "body": ["import", "FUNCTIONNAME", "semicolon"]},
     {"head": "LOOP", "body": ["while", "CONDITION", "lbrace", "BODY", "rbrace"]},
-    {"head": "BODY", "body": []},
     {"head": "BODY", "body": ["ASSIGN"]},
     {"head": "BODY", "body": ["LOOP"]},
     {"head": "ASSIGN", "body": ["incr", "IDENTIFIER", "semicolon"]},
@@ -22,7 +18,6 @@
     {"head": "ASSIGN", "body": ["IDENTIFIER", "OPERATION", "DIGIT", "semicolon"]},
     {"head": "ASSIGN", "body": ["const","IDENTIFIER", "OPERATION", "DIGIT", "semicolon"]},
     {"head": "ASSIGN", "body": ["print", "lparen", "IDENTIFIER", "rparen", "semicolon"]},
-    {"head": "ARGUMENT", "body": ["ARGUMENT", "comma", "ARGUMENT"]},
     {"head": "ARGUMENT", "body": ["IDENTIFIER"]},
     {"head": "CONDITION", "body": ["IDENTIFIER", "OPERATION", "IDENTIFIER"]},
     {"head": "CONDITION", "body": ["IDENTIFIER", "OPERATION", "DIGIT"]},
