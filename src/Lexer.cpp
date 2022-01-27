@@ -251,7 +251,10 @@ void Lexer::addEpsilon(){
         auto itPos = Tokens.begin() + index;
         Tokens.insert(itPos, Token(epsilon_, "#"));
     }
-    
+    else{
+        Tokens.insert(Tokens.begin(), Token(epsilon_, "#"));
+    }
+
     Tokens.push_back(Token(epsilon_, "#"));
 }
 
