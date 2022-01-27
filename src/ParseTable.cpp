@@ -171,14 +171,20 @@ std::string getTypeString(enum TokenType type){
 
 void ParseTable::checkInputTokens(const std::vector<Token> &input) {
     //TODO Create Abstract syntax tree
-    std::vector<std::string> contents = {table.begin()->first};
+    std::vector<std::string> contents{table.begin()->first};
     std::vector<Token> remainingInput = input;
-    while(contents[contents.size()-1] != "accept"){
+    while(contents.back() != "accept"){
         if(remainingInput.empty()){
-            if(table[contents[contents.size()-1]]["EOS"].empty()){
+            if(table[contents.back()]["EOS"].empty()){
+                std::cout<<"error1"<<std::endl;
                 //TODO error detection
+                return;
             }else {
-                computeOperation(contents,remainingInput, table[contents[contents.size()-1]]["EOS"]);
+                if(!computeOperation(contents,remainingInput, table[contents.back()]["EOS"])){
+                    std::cout<<"error3"<<std::endl;
+                    //TODO error detection
+                    return;
+                }
             }
         }else {
             Token token = remainingInput[0];
@@ -187,17 +193,27 @@ void ParseTable::checkInputTokens(const std::vector<Token> &input) {
                 remainingInput.erase(remainingInput.begin());
                 continue;
             }
-            if(table[contents[contents.size()-1]][getTypeString(token.type)].empty()){
+            if(table[contents.back()][getTypeString(token.type)].empty()){
+                std::cout<<"error2"<<std::endl;
                 //TODO error detection
+                return;
             }else{
-                computeOperation(contents, remainingInput, table[contents[contents.size()-1]][getTypeString(token.type)],
-                                 getTypeString(token.type));
+                if(!computeOperation(contents, remainingInput, table[contents.back()][getTypeString(token.type)],
+                                 getTypeString(token.type))){
+                    std::cout<<"error3"<<std::endl;
+                    //TODO error detection
+                    return;
+                }
             }
         }
+        for(auto i:contents){
+            std::cout<<i;
+        }
+        std::cout<<std::endl;
     }
 }
 
-void ParseTable::computeOperation(std::vector<std::string> &contents, std::vector<Token> &remainingInput, const std::string &operation, const std::string token) {
+bool ParseTable::computeOperation(std::vector<std::string> &contents, std::vector<Token> &remainingInput, const std::string &operation, const std::string token) {
     //Shifts
     if(operation.find("shift") != operation.npos){
         contents.push_back(token);
@@ -218,11 +234,11 @@ void ParseTable::computeOperation(std::vector<std::string> &contents, std::vecto
             go_to.push_back(replaceItems.substr(0,pos));
             replaceItems.erase(0,pos+1);
         }
-        for(int i = 0; i < go_to.size(); i++){
-            if(contents[contents.size()-2-(2*i)] == go_to[i]){
+        for(int i = go_to.size()-1; i >= 0; i--){
+            if(contents[contents.size()-2-(2*i)] == go_to[go_to.size()-1-i]){
                 continue;
             }else {
-                //TODO error detection
+                return false;
             }
         }
         contents.erase(contents.end()-(2*(go_to.size())), contents.end());
@@ -234,6 +250,7 @@ void ParseTable::computeOperation(std::vector<std::string> &contents, std::vecto
     else if(operation == "accept"){
         contents.push_back("accept");
     }
+    return true;
 }
 
 

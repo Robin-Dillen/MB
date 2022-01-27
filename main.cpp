@@ -8,25 +8,30 @@
 
 int main(int argc, char **argv) {
 
-//    FileLoader fl("../testcode.txt");
-//    Lexer lexer(fl.getFilecontents());
-//    const std::vector<Token> &tokens = lexer.getTokens();
-//
-//    CFG *cfg = new CFG("../CFGs/CFG_2_1.json");
-//
-//    Parser p(cfg);
-//    ParseTable table = std::move(p.getParseTable());
-//
-//
-//    std::ofstream file;
-//    file.open("../ParseTableOutput.txt");
-//    if (file) {
-//        table.printTableToFile(file);
-//    }
-//    file.close();
-//
-//    table.checkInputTokens(tokens);
-    Identifier* variable = new Identifier("x");
+    FileLoader fl("../testcode.txt");
+    Lexer lexer(fl.getFilecontents());
+    const std::vector<Token> &tokens = lexer.getTokens();
+
+    CFG *cfg = new CFG("../CFGs/CFG_2_1.json");
+    cfg->print();
+
+    Parser p(cfg);
+    ParseTable table = std::move(p.getParseTable());
+
+
+    std::ofstream file;
+    file.open("../ParseTableOutput.txt");
+    if (file) {
+        table.printTableToFile(file);
+    }
+    file.close();
+
+    table.checkInputTokens(tokens);
+
+
+
+
+    /*Identifier* variable = new Identifier("x");
     AST::AbstractSyntaxTree<Data*> ast_root(new Root, 0);
     AST::AbstractSyntaxTree<Data*> ast_store(new Store, 0);
     AST::AbstractSyntaxTree<Data*> ast_var1(variable, 0);
@@ -55,6 +60,7 @@ int main(int argc, char **argv) {
     ast_decr.appendChild(&ast_var4);
 
     compile(ast_root);
+    */
 
     return 0;
 }
