@@ -187,7 +187,7 @@ inline std::string getTypeString(enum TokenType type){
         case epsilon2_:
             return "epsilon2_";
         default:
-            return "junk";
+            return "";
     }
 }
 
