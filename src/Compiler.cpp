@@ -153,14 +153,12 @@ public:
     }
 };
 
-void compileNode(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &node, Program &program);
+void compileNode(typename AST::AbstractSyntaxTree<Token *>::Const_Iterator &node, Program &program);
 
 
-void constructWhile(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &node, Program &program) {
+void constructWhile(typename AST::AbstractSyntaxTree<Token *>::Const_Iterator &node, Program &program) {
     ++node; // first argument (identifier)
-    const Identifier *const identifier = dynamic_cast<Identifier *>(node->getData());
-    assert(identifier);
-    std::string name = identifier->get();
+    std::string name = node->getData()->value;
     PyObject *py_name = PyUnicode_FromStringAndSize(name.c_str(), name.size());
     int name_index = program.findValueOrAdd(py_name);
 
@@ -171,33 +169,31 @@ void constructWhile(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &no
     program << LOAD_CONST << (unsigned char) const_index << EOL;
     program << COMPARE_OP << (unsigned char) NEQ << EOL;
     ++node; // body
-    if (node->getData()->getType() == end_) {
+    if (node->getData()->type == end_) {
         std::stringstream error_msg;
         error_msg << "Error on line: " << "[WIP]" << " ,can't have a while loop with an empty body!" << std::endl;
         throw CompilationError(error_msg.str());
     }
     Program temp;
-    AST::AbstractSyntaxTree<Data *>::Const_Iterator node_cpy = node;
+    AST::AbstractSyntaxTree<Token *>::Const_Iterator node_cpy = node;
     do {
         compileNode(node_cpy, temp);
         ++node_cpy;
-    } while (node_cpy->getData()->getType() != end_);
+    } while (node_cpy->getData()->type != end_);
     std::cout << temp.getLineNo() << std::endl;
     program << POP_JUMP_IF_FALSE << (unsigned char) (program.getLineNo() + temp.getLineNo() + 6)
             << EOL; // +2 for current op and +2 for jump absolute
     do {
         compileNode(node, program);
         ++node;
-    } while (node->getData()->getType() != end_);
+    } while (node->getData()->type != end_);
     program << JUMP_ABSOLUTE << (unsigned char) begin << EOL;
 }
 
 
-void constructIncr(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &node, Program &program) {
+void constructIncr(typename AST::AbstractSyntaxTree<Token *>::Const_Iterator &node, Program &program) {
     ++node; // first argument (identifier)
-    const Identifier *const identifier = dynamic_cast<Identifier *>(node->getData());
-    assert(identifier);
-    std::string name = identifier->get();
+    std::string name = node->getData()->value;
     int name_index = program.findValueOrAdd(PyUnicode_FromStringAndSize(name.c_str(), name.size()));
     int const_index = program.findConstOrAdd(PyLong_FromLong(1));
 
@@ -208,11 +204,9 @@ void constructIncr(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &nod
 }
 
 
-void constructDecr(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &node, Program &program) {
+void constructDecr(typename AST::AbstractSyntaxTree<Token *>::Const_Iterator &node, Program &program) {
     ++node; // first argument (identifier)
-    const Identifier *const identifier = dynamic_cast<Identifier *>(node->getData());
-    assert(identifier);
-    std::string name = identifier->get();
+    std::string name = node->getData()->value;
     int name_index = program.findValueOrAdd(PyUnicode_FromStringAndSize(name.c_str(), name.size()));
     int const_index = program.findConstOrAdd(PyLong_FromLong(1));
 
@@ -235,17 +229,13 @@ void constructDecr(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &nod
 }
 
 
-void constructStore(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &node, Program &program) {
+void constructStore(typename AST::AbstractSyntaxTree<Token *>::Const_Iterator &node, Program &program) {
     ++node; // first argument (identifier)
-    const Identifier *const identifier = dynamic_cast<Identifier *>(node->getData());
-    assert(identifier);
-    std::string name = identifier->get();
+    std::string name = node->getData()->value;
     int var_index = program.findValueOrAdd(PyUnicode_FromStringAndSize(name.c_str(), name.size()));
 
     ++node; // second argument (const value)
-    const Const *const aConst = dynamic_cast<Const *>(node->getData());
-    assert(aConst);
-    unsigned int value = aConst->get();
+    unsigned int value = std::stoi(node->getData()->value);
     int const_index = program.findConstOrAdd(PyLong_FromLong(value));
 
     program << LOAD_CONST << (unsigned char) const_index << EOL;
@@ -253,13 +243,11 @@ void constructStore(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &no
 }
 
 
-void constructPrint(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &node, Program &program) {
+void constructPrint(typename AST::AbstractSyntaxTree<Token *>::Const_Iterator &node, Program &program) {
     ++node; // first argument (variable)
     int print_index = program.findValueOrAdd(PyUnicode_FromStringAndSize("print", 5));
 
-    const Identifier *const identifier = dynamic_cast<Identifier *>(node->getData());
-    assert(identifier);
-    std::string name = identifier->get();
+    std::string name = node->getData()->value;
     int var_index = program.findValueOrAdd(PyUnicode_FromStringAndSize(name.c_str(), name.size()));
 
     program << LOAD_NAME << (unsigned char) print_index << EOL;
@@ -269,14 +257,10 @@ void constructPrint(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &no
 }
 
 
-void constructFunc(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &node, Program &program) {
-    const Func *const func = dynamic_cast<Func *>(node->getData());
-    assert(func);
-    bool by_ref = func->get();
+void constructFunc(typename AST::AbstractSyntaxTree<Token *>::Const_Iterator &node, Program &program) {
+    bool by_ref = std::stoi(node->getData()->value);
     ++node; // first argument (module name/identifier)
-    const Identifier *const identifier = dynamic_cast<Identifier *>(node->getData());
-    assert(identifier);
-    std::string module_name = identifier->get();
+    std::string module_name = node->getData()->value;
 
     int sys = program.findValue(PyUnicode_FromStringAndSize("sys", 3));
     assert(sys != -1);
@@ -285,15 +269,15 @@ void constructFunc(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &nod
 
     std::vector<std::string> args;
     do {
-        Identifier *arg = dynamic_cast<Identifier *>(node->getData());
-        if (arg == nullptr) {
+
+        if (node->getData()->type != identifier_) {
             std::stringstream error_msg;
             error_msg << "Error on line: " << "[WIP]" << " ,invalid function argument!" << std::endl;
             throw CompilationError(error_msg.str());
         }
-        args.emplace_back(arg->get());
+        args.emplace_back(node->getData()->value);
         ++node;
-    } while (node->getData()->getType() != end_);
+    } while (node->getData()->type != end_);
     { // put the arguments in sys.argv
         for (const std::string &arg: args) {
             int name_i = program.findValue(PyUnicode_FromStringAndSize(arg.c_str(), arg.size()));
@@ -374,8 +358,8 @@ void constructFunc(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &nod
 }
 
 
-void compileNode(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &node, Program &program) {
-    switch (node->getData()->getType()) {
+void compileNode(typename AST::AbstractSyntaxTree<Token *>::Const_Iterator &node, Program &program) {
+    switch (node->getData()->type) {
         case root_:
         {
             int zero = program.findConstOrAdd(PyLong_FromLong(0));
@@ -451,6 +435,7 @@ void compileNode(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &node,
             break;
 
         case operator_:
+            assert(node->getData()->value == "=");
             constructStore(node, program);
             break;
 
@@ -467,7 +452,7 @@ void compileNode(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &node,
 }
 
 
-void compile(const AST::AbstractSyntaxTree<Data *> &ast) {
+void compile(const AST::AbstractSyntaxTree<Token *> &ast) {
     Py_SetPythonHome(L"C:/Users/nibor/AppData/Local/Programs/Python/Python39");
     Py_Initialize();
     Program program;

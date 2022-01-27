@@ -1,10 +1,13 @@
 //
 // Created by Khemin on 11-12-2021.
 //
+#include "ParseTable.h"
+#include "AbstractSyntaxTree/AbstractSyntaxTree.h"
+#include "Data.h"
 
 #include <fstream>
-#include "ParseTable.h"
 #include <algorithm>
+#include <stack>
 
 
 ParseTable::ParseTable(const DFA &dfa) {
@@ -165,11 +168,17 @@ std::string getTypeString(enum TokenType type){
             return "const";
         case newline_ :
             return "newline";
+        default:
+            return {};
     }
-    return {};
 }
 
 void ParseTable::checkInputTokens(const std::vector<Token> &input) {
+    auto root = new AST::AbstractSyntaxTree<Token*>(new Token(root_, ""), 0);
+    std::stack<AST::AbstractSyntaxTree<Token*>*> current;
+    current.push(root);
+    int line_no = 0;
+    Token cache(root_, "");
     //TODO Create Abstract syntax tree
     std::vector<std::string> contents{table.begin()->first};
     std::vector<Token> remainingInput = input;
@@ -187,12 +196,50 @@ void ParseTable::checkInputTokens(const std::vector<Token> &input) {
                 }
             }
         }else {
-            Token token = remainingInput[0];
-            //TODO add to abstract syntax tree
-            if(token.type == newline_) {
-                remainingInput.erase(remainingInput.begin());
-                continue;
+            Token token = remainingInput.front();
+            remainingInput.erase(remainingInput.begin());
+            switch (token.type) {
+                case newline_:
+                    ++line_no;
+                    continue;
+
+                case rparen_:
+                case rbrace_:
+                    current.top()->appendChild(new AST::AbstractSyntaxTree<Token *>(new Token(end_, ""), line_no));
+                    current.pop();
+                    continue;
+                case semicolon_:
+                    if (current.top()->getData()->type == incr_ || current.top()->getData()->type == decr_ || current.top()->getData()->type == operator_)
+                        current.pop();
+                    continue;
+
+                case identifier_:
+                    cache = token;
+                    continue;
+
+                default:
+                    break;
             }
+            auto new_node = new AST::AbstractSyntaxTree<Token *>(new Token(token), line_no);
+            current.top()->appendChild(new_node);
+
+            switch (token.type) {
+                case while_:
+                case incr_:
+                case decr_:
+                case filename_:
+                case print_:
+                    current.push(new_node);
+                    break;
+
+                case operator_:
+                    if (token.value != "=") break;
+                    current.push(new_node);
+                    current.top()->appendChild(new AST::AbstractSyntaxTree<Token *>(new Token(cache), line_no));
+                    break;
+
+            }
+
             if(table[contents.back()][getTypeString(token.type)].empty()){
                 std::cout<<"error2"<<std::endl;
                 //TODO error detection
