@@ -170,12 +170,16 @@ AST::AbstractSyntaxTree<Token*>* ParseTable::checkInputTokens(const std::vector<
                     current.pop();
                     goto exit_check;
                 case semicolon_:
-                    if (current.top()->getData()->type == incr_ || current.top()->getData()->type == decr_ || current.top()->getData()->type == operator_)
+                    if (current.top()->getData()->type == func_)
+                        current.top()->appendChild(new AST::AbstractSyntaxTree<Token *>(new Token(endfunc_, "end"), line_no));
+                    if (current.top()->getData()->type == incr_ || current.top()->getData()->type == decr_ || current.top()->getData()->type == operator_ || current.top()->getData()->type == func_)
                         current.pop();
                     goto exit_check;
 
+                case inplace_:
+                case import_:
                 case identifier_:
-                    if (remainingInput[1].type != operator_) break;
+                    if (current.top()->getData()->type == func_ || current.top()->getData()->type == print_) break;
                     cache = token;
                     goto exit_check;
 
@@ -187,8 +191,17 @@ AST::AbstractSyntaxTree<Token*>* ParseTable::checkInputTokens(const std::vector<
                     break;
             }
             {
-                auto new_node = new AST::AbstractSyntaxTree<Token *>(new Token(token), line_no);
-                current.top()->appendChild(new_node);
+                AST::AbstractSyntaxTree<Token *>* new_node;
+                if (token.type == filename_){
+                    if (cache.type == import_) goto exit_check;
+                    new_node = new AST::AbstractSyntaxTree<Token *>(new Token(func_, cache.type == const_ ? cache.value: "0"), line_no);
+                    current.top()->appendChild(new_node);
+                    new_node->appendChild(new AST::AbstractSyntaxTree<Token *>(new Token(identifier_, token.value), line_no));
+                }
+                else {
+                    new_node = new AST::AbstractSyntaxTree<Token *>(new Token(token), line_no);
+                    current.top()->appendChild(new_node);
+                }
 
                 switch (token.type) {
                     case while_:

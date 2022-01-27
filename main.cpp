@@ -7,36 +7,38 @@
 
 int main(int argc, char **argv) {
 
-    for (int i = 1; i < argc; i++) {
-        std::string filename = argv[i];
-        std::cout << filename << std::endl;
-        FileLoader fl(filename);
-        Lexer lexer(fl.getFilecontents());
-        const std::vector<Token> &tokens = lexer.getTokens();
+    std::string filename = argv[1];
+    std::cout << filename << std::endl;
+    FileLoader fl(filename);
+    Lexer lexer(fl.getFilecontents());
+    const std::vector<Token> &tokens = lexer.getTokens();
 
     CFG *cfg = new CFG("../CFGs/CFG_2_0.json");
 //    cfg->print();
 
-        Parser p(cfg);
-        ParseTable table = std::move(p.getParseTable());
+    Parser p(cfg);
+    ParseTable table = std::move(p.getParseTable());
 
 
-        std::ofstream file;
-        file.open("../ParseTableOutput.txt");
-        if (file) {
-            table.printTableToFile(file);
-        }
-        file.close();
-        std::string output_file = filename.substr(0, filename.size() - 4);
-        try {
-            auto tree = table.checkInputTokens(tokens);
-            if (tree)
-                compile(*table.checkInputTokens(tokens), output_file);
-        } catch (CompilationError& e){
-            std::cerr << "The compilation was aborted!" << std::endl << e.what() << std::endl;
-        }
-        std::cout << "-----------------------------------" << std::endl;
+    std::ofstream file;
+    file.open("../ParseTableOutput.txt");
+    if (file) {
+        table.printTableToFile(file);
     }
+    file.close();
+    int index = 0;
+    do{
+        index = filename.find('/', index);
+    }while (filename.find('/', ++index) != std::string::npos);
+
+    std::string output_file = filename.substr(index, filename.size() - index - 4);
+
+        auto tree = table.checkInputTokens(tokens);
+        if (tree)
+            compile(*table.checkInputTokens(tokens), output_file);
+
+    std::cout << "-----------------------------------" << std::endl;
+
 
 
 

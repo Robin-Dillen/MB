@@ -178,7 +178,7 @@ void constructWhile(typename AST::AbstractSyntaxTree<Token *>::Const_Iterator &n
     ++node; // body
     if (node->getData()->type == endwhile_) {
         std::stringstream error_msg;
-        error_msg << "Error on line: " << "[WIP]" << " ,can't have a while loop with an empty body!" << std::endl;
+        error_msg << "Error on line: " << node->getLineNo() << " ,can't have a while loop with an empty body!" << std::endl;
         throw CompilationError(error_msg.str());
     }
     Program temp;
@@ -275,10 +275,10 @@ void constructFunc(typename AST::AbstractSyntaxTree<Token *>::Const_Iterator &no
 
     std::vector<std::string> args;
     do {
-
-        if (node->getData()->type != identifier_) {
+        if (node->getData()->type != identifier_ && node->getData()->type != endfunc_) {
+            std::cout << getTypeString(node->getData()->type) << std::endl;
             std::stringstream error_msg;
-            error_msg << "Error on line: " << "[WIP]" << " ,invalid function argument!" << std::endl;
+            error_msg << "Error on line: " << node->getLineNo() << " ,invalid function argument!" << std::endl;
             throw CompilationError(error_msg.str());
         }
         args.emplace_back(node->getData()->value);
@@ -299,7 +299,7 @@ void constructFunc(typename AST::AbstractSyntaxTree<Token *>::Const_Iterator &no
     if (module == -1) {
         if (!file_exists("../" + module_name + ".pyc")) {
             std::stringstream error_msg;
-            error_msg << "Error on line: " << "[WIP]" << " ,file not found!" << std::endl;
+            error_msg << "Error on line: " << node->getLineNo() << " ,file not found!" << std::endl;
             throw CompilationError(error_msg.str());
         }
         module = program.findValueOrAdd(PyUnicode_FromStringAndSize(module_name.c_str(), module_name.size()));
