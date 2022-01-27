@@ -307,11 +307,16 @@ void constructFunc(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &nod
 
     int module = program.findValue(PyUnicode_FromStringAndSize(module_name.c_str(), module_name.size()));
     if (module == -1) {
-        if (!file_exists(module_name)) {
+        if (!file_exists("../" + module_name + ".pyc")) {
             std::stringstream error_msg;
             error_msg << "Error on line: " << "[WIP]" << " ,file not found!" << std::endl;
             throw CompilationError(error_msg.str());
         }
+        module = program.findValueOrAdd(PyUnicode_FromStringAndSize(module_name.c_str(), module_name.size()));
+        int zero = program.findConstOrAdd(PyLong_FromLong(0));
+        int none = program.findConstOrAdd(Py_None);
+        program << LOAD_CONST << (unsigned char) zero << EOL;
+        program << LOAD_CONST << (unsigned char) none << EOL;
         program << IMPORT_NAME << (unsigned char) module << EOL;
         program << STORE_NAME << (unsigned char) module << EOL;
     } else {
@@ -351,7 +356,7 @@ void constructFunc(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &nod
             program << STORE_NAME << (unsigned char) output << EOL;
         }
         program << POP_BLOCK << (unsigned char) 0 << EOL;
-        program << JUMP_ABSOLUTE << (unsigned char) start << EOL;
+        program << JUMP_FORWARD << (unsigned char) 18 << EOL;
 
         program << DUP_TOP << (unsigned char) 0 << EOL;
         program << LOAD_NAME << (unsigned char) attr_error << EOL;
@@ -363,11 +368,8 @@ void constructFunc(typename AST::AbstractSyntaxTree<Data *>::Const_Iterator &nod
 
         program << POP_EXCEPT << (unsigned char) 0 << EOL;
         jump = program.getLineNo() + 12;
-        program << JUMP_ABSOLUTE << (unsigned char) jump << EOL;
-        program << POP_EXCEPT << (unsigned char) 0 << EOL;
-        program << JUMP_ABSOLUTE << (unsigned char) start << EOL;
+        program << JUMP_FORWARD << (unsigned char) 2 << EOL;
         program << RERAISE << (unsigned char) 0 << EOL;
-        program << JUMP_ABSOLUTE << (unsigned char) start << EOL;
     }
 }
 
@@ -478,10 +480,10 @@ void compile(const AST::AbstractSyntaxTree<Data *> &ast) {
     PyCodeObject *codeObject = program.getCodeObject();
     PyBytes_AsStringAndSize(codeObject->co_code, &marshalled, &length);
     for (int i = 0; i < length; i++)
-        std::cout << (int) marshalled[i] << " ";
+        std::cout << (int)(unsigned char) marshalled[i] << " ";
     PyObject *source = PyMarshal_WriteObjectToString((PyObject *) (codeObject), Py_MARSHAL_VERSION);
     PyBytes_AsStringAndSize(source, &marshalled, &length);
-    std::ofstream file("../test.pyc", std::ios::binary | std::ios::trunc);
+    std::ofstream file("../test2.pyc", std::ios::binary | std::ios::trunc);
     {
         constexpr short int magic_int = (PY_MINOR_VERSION == 9 ? 3425 : 3400); // magic int for python 3.8 or 3.9
         char byte1, byte2, byte3 = '\r', byte4 = '\n';

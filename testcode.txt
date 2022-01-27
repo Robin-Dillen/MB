@@ -1,3 +1,5 @@
 while Today != 0 {
-    incr Aux;
+    while idk != 2 {
+        incr Aux;
+    }
 }

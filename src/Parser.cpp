@@ -17,9 +17,14 @@ void Parser::canonicalCollection() {
     vector<Variable *> variables = {};
     cfg->getClosure(start->getName(), variables);
     map<string, vector<vector<string>>> productions = varsToProds(variables);
+    DFAState *rootstate = new DFAState("-1", productions, false);
+    UpperRoot = rootstate;
+    map<string, vector<vector<string>>> state0productions;
+    state0productions[start->getName()] = start->getProductions();
+    getClosure(state0productions);
     DFAState *stateZero = new DFAState("0", productions, false);
-    UpperRoot = stateZero;
     dfaStates.push_back(stateZero);
+    printState(state0productions);
     create_canonical_states(stateZero);
 
 }
@@ -33,7 +38,7 @@ map<string, vector<vector<string>>> Parser::varsToProds(const vector<Variable *>
 }
 
 void Parser::create_canonical_states(DFAState *rootState) {
-    for (auto mapItem: rootState->getContent()) {
+     for (const auto& mapItem: rootState->getContent()) {
         for (auto production: mapItem.second) {
             int i = checkSymLoc(production);
             if (i != production.size() - 1) {
@@ -51,7 +56,7 @@ void Parser::create_canonical_states(DFAState *rootState) {
                     rootState->addTransition(production[i + 1], state);
                     create_canonical_states(state);
 
-                    cout<<name<<endl;
+                    cout<<"state name: "<<name<<endl;
                     printState(newStateProductions);
                 }
 
