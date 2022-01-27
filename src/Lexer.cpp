@@ -199,6 +199,7 @@ void Lexer::tokenize(const std::string &str) {
         Tokens.push_back(Token(filename_, filenameStr));
         filenames.push_back(filenameStr);
     }
+    this->addEpsilon();
 }
 
 void Lexer::printTokens() {
@@ -213,7 +214,7 @@ void Lexer::printTokens() {
 }
 
 void Lexer::printTokenString(){
-    this->addEpsilon();
+
     for (Token token: Tokens) {
         if(getTokenName(token) == "newline"){
             std::cout << std::endl;
@@ -231,30 +232,31 @@ void Lexer::addEpsilon(){
             imprt_counter += 1;
         }
     }
-    int index = 0;
-    bool newline = false;
-    int imprt_counter_ = 0;
-    for (Token token: Tokens) {
-        if(token.type == import_){
-            imprt_counter_ += 1;
-        }
-        if(imprt_counter == imprt_counter_){
-            newline = true;
-        }
-        if(newline && token.type == newline_){
-            break;
-        }
-        index += 1;
+    if(imprt_counter != 0){
+        int index = 0;
+        bool newline = false;
+        int imprt_counter_ = 0;
+        for (Token token: Tokens) {
+            if(token.type == import_){
+                imprt_counter_ += 1;
+            }
+            if(imprt_counter == imprt_counter_){
+                newline = true;
+            }
+            if(newline && token.type == newline_){
+                break;
+            }
+            index += 1;
+            }
+        auto itPos = Tokens.begin() + index;
+        Tokens.insert(itPos, Token(epsilon_, "#"));
     }
-
-
-    auto itPos = Tokens.begin() + index;
-    Tokens.insert(itPos, Token(epsilon_, "#"));
+    
     Tokens.push_back(Token(epsilon_, "#"));
 }
 
 const std::vector<Token> &Lexer::getTokens() {
-    this->addEpsilon();
+
     return Tokens;
 }
 
